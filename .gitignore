@@ -1,0 +1,59 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Dependency directories
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Augment/Roo/Cursor specific
+.roo/
+.cursor/
+.roomodes
+.taskmasterconfig
+
+# Project specific
+/docs/
+/scripts/
+
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+.pytest_cache/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# DO NOT ignore .env files (private repo)
+# .env
