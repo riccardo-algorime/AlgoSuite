@@ -15,7 +15,7 @@ export const Card = ({ title, subtitle, children, ...rest }: CardProps) => {
       overflow="hidden"
       p={6}
       boxShadow="md"
-      bg="white"
+      bg="gray.800"
       {...rest}
     >
       <VStack align="stretch" spacing={4}>
@@ -25,7 +25,7 @@ export const Card = ({ title, subtitle, children, ...rest }: CardProps) => {
               {title}
             </Heading>
             {subtitle && (
-              <Text color="gray.600" mt={1}>
+              <Text color="gray.400" mt={1}>
                 {subtitle}
               </Text>
             )}
