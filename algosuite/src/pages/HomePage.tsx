@@ -1,45 +1,80 @@
-import '../styles/HomePage.css'
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Grid,
+  Heading,
+  SimpleGrid,
+  Text,
+  VStack
+} from '@chakra-ui/react'
+import { Card } from '../components/Card'
 
 export const HomePage = () => {
   return (
-    <div className="home-page">
-      <section className="hero">
-        <h1>Welcome to AlgoSuite</h1>
-        <p className="subtitle">
-          A powerful suite of algorithmic tools for your business needs
-        </p>
-      </section>
+    <VStack spacing={12} align="stretch">
+      <Box
+        as="section"
+        bg="background.card"
+        py={16}
+        textAlign="center"
+      >
+        <Container maxW="container.lg">
+          <Heading as="h1" size="2xl" mb={4}>
+            Welcome to AlgoSuite
+          </Heading>
+          <Text
+            fontSize="xl"
+            maxW="600px"
+            mx="auto"
+            color="text.secondary"
+          >
+            A powerful suite of algorithmic tools for your business needs
+          </Text>
+        </Container>
+      </Box>
 
-      <section className="get-started">
-        <h2>Get Started</h2>
-        <p>
-          AlgoSuite provides a comprehensive set of tools to help you analyze data,
-          optimize processes, and make better decisions.
-        </p>
-        <button className="button">Explore Features</button>
-      </section>
+      <Box as="section" py={8}>
+        <Container maxW="container.lg">
+          <Card p={8}>
+            <VStack spacing={6} align="flex-start">
+              <Heading as="h2" size="xl">
+                Get Started
+              </Heading>
+              <Text fontSize="lg">
+                AlgoSuite provides a comprehensive set of tools to help you analyze data,
+                optimize processes, and make better decisions.
+              </Text>
+              <Button variant="primary" size="lg">
+                Explore Features
+              </Button>
+            </VStack>
+          </Card>
+        </Container>
+      </Box>
 
-      <section className="features">
-        <h2>Our Features</h2>
-        <div className="feature-grid">
-          <div className="feature-card">
-            <h3>Data Analysis</h3>
-            <p>Powerful tools for analyzing complex datasets and extracting valuable insights.</p>
-          </div>
-          <div className="feature-card">
-            <h3>Process Optimization</h3>
-            <p>Optimize your business processes with our advanced algorithms.</p>
-          </div>
-          <div className="feature-card">
-            <h3>Predictive Analytics</h3>
-            <p>Forecast future trends and make data-driven decisions with confidence.</p>
-          </div>
-          <div className="feature-card">
-            <h3>Custom Solutions</h3>
-            <p>Tailored algorithmic solutions designed to meet your specific business needs.</p>
-          </div>
-        </div>
-      </section>
-    </div>
+      <Box as="section" py={8}>
+        <Container maxW="container.lg">
+          <Heading as="h2" size="xl" textAlign="center" mb={10}>
+            Our Features
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8}>
+            <Card title="Data Analysis">
+              <Text>Powerful tools for analyzing complex datasets and extracting valuable insights.</Text>
+            </Card>
+            <Card title="Process Optimization">
+              <Text>Optimize your business processes with our advanced algorithms.</Text>
+            </Card>
+            <Card title="Predictive Analytics">
+              <Text>Forecast future trends and make data-driven decisions with confidence.</Text>
+            </Card>
+            <Card title="Custom Solutions">
+              <Text>Tailored algorithmic solutions designed to meet your specific business needs.</Text>
+            </Card>
+          </SimpleGrid>
+        </Container>
+      </Box>
+    </VStack>
   )
 }

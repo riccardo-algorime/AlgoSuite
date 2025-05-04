@@ -4,7 +4,12 @@ import {
   Textarea,
   VStack,
   Box,
-  Text
+  Text,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Alert,
+  AlertIcon
 } from '@chakra-ui/react'
 import { useState } from 'react'
 
@@ -101,61 +106,65 @@ export const ContactForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <VStack spacing={4} align="stretch">
+      <VStack spacing={6} align="stretch">
         {notification.message && (
-          <Box
-            p={3}
+          <Alert
+            status={notification.type === 'success' ? 'success' : 'error'}
+            variant="subtle"
             borderRadius="md"
-            bg={notification.type === 'success' ? 'green.100' : 'red.100'}
-            color={notification.type === 'success' ? 'green.800' : 'red.800'}
+            bg={notification.type === 'success' ? 'green.800' : 'red.800'}
+            color="white"
           >
-            <Text>{notification.message}</Text>
-          </Box>
+            <AlertIcon />
+            {notification.message}
+          </Alert>
         )}
 
-        <div>
-          <label htmlFor="name">Name</label>
+        <FormControl isInvalid={!!errors.name}>
+          <FormLabel htmlFor="name">Name</FormLabel>
           <Input
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            isInvalid={!!errors.name}
+            placeholder="Your name"
           />
-          {errors.name && <div style={{ color: 'red', fontSize: '0.875rem' }}>{errors.name}</div>}
-        </div>
+          <FormErrorMessage>{errors.name}</FormErrorMessage>
+        </FormControl>
 
-        <div>
-          <label htmlFor="email">Email</label>
+        <FormControl isInvalid={!!errors.email}>
+          <FormLabel htmlFor="email">Email</FormLabel>
           <Input
             id="email"
             name="email"
             type="email"
             value={formData.email}
             onChange={handleChange}
-            isInvalid={!!errors.email}
+            placeholder="your.email@example.com"
           />
-          {errors.email && <div style={{ color: 'red', fontSize: '0.875rem' }}>{errors.email}</div>}
-        </div>
+          <FormErrorMessage>{errors.email}</FormErrorMessage>
+        </FormControl>
 
-        <div>
-          <label htmlFor="message">Message</label>
+        <FormControl isInvalid={!!errors.message}>
+          <FormLabel htmlFor="message">Message</FormLabel>
           <Textarea
             id="message"
             name="message"
             value={formData.message}
             onChange={handleChange}
-            rows={5}
-            isInvalid={!!errors.message}
+            placeholder="Your message"
+            minH="120px"
           />
-          {errors.message && <div style={{ color: 'red', fontSize: '0.875rem' }}>{errors.message}</div>}
-        </div>
+          <FormErrorMessage>{errors.message}</FormErrorMessage>
+        </FormControl>
 
         <Button
           type="submit"
-          colorScheme="blue"
+          variant="primary"
           isLoading={isSubmitting}
           loadingText="Sending"
+          size="md"
+          width="full"
         >
           Send Message
         </Button>

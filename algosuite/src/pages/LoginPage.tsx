@@ -1,7 +1,23 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import '../styles/LoginPage.css';
+import {
+  Box,
+  Button,
+  Center,
+  Container,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Link,
+  Text,
+  VStack,
+  Alert,
+  AlertIcon,
+  FormErrorMessage
+} from '@chakra-ui/react';
+import { Card } from '../components/Card';
 
 export const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -50,45 +66,76 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <h1>Login to AlgoSuite</h1>
+    <Center minH="80vh" py={12}>
+      <Container maxW="md" p={0}>
+        <Card p={8}>
+          <VStack spacing={6} align="stretch">
+            <Heading as="h1" size="xl" textAlign="center">
+              Login to AlgoSuite
+            </Heading>
 
-        {error && <div className="error-message">{error}</div>}
-        {successMessage && <div className="success-message">{successMessage}</div>}
+            {error && (
+              <Alert status="error" borderRadius="md" bg="red.800" color="white">
+                <AlertIcon />
+                {error}
+              </Alert>
+            )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
+            {successMessage && (
+              <Alert status="success" borderRadius="md" bg="green.800" color="white">
+                <AlertIcon />
+                {successMessage}
+              </Alert>
+            )}
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
+            <form onSubmit={handleSubmit}>
+              <VStack spacing={4}>
+                <FormControl isRequired>
+                  <FormLabel htmlFor="username">Username</FormLabel>
+                  <Input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    isDisabled={isLoading}
+                    placeholder="Enter your username"
+                  />
+                </FormControl>
 
-          <button type="submit" className="login-button" disabled={isLoading}>
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
+                <FormControl isRequired>
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    isDisabled={isLoading}
+                    placeholder="Enter your password"
+                  />
+                </FormControl>
 
-        <div className="auth-links">
-          Don't have an account? <Link to="/register">Sign up</Link>
-        </div>
-      </div>
-    </div>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  isLoading={isLoading}
+                  loadingText="Logging in..."
+                  width="full"
+                  mt={4}
+                >
+                  Login
+                </Button>
+              </VStack>
+            </form>
+
+            <Text textAlign="center" fontSize="sm" mt={4}>
+              Don't have an account?{' '}
+              <Link as={RouterLink} to="/register" color="blue.300" _hover={{ color: 'blue.200' }}>
+                Sign up
+              </Link>
+            </Text>
+          </VStack>
+        </Card>
+      </Container>
+    </Center>
   );
 };

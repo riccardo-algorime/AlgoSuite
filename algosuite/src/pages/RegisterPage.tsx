@@ -1,7 +1,23 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import '../styles/RegisterPage.css';
+import {
+  Box,
+  Button,
+  Center,
+  Container,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Link,
+  Text,
+  VStack,
+  Alert,
+  AlertIcon,
+  FormErrorMessage
+} from '@chakra-ui/react';
+import { Card } from '../components/Card';
 
 export const RegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -69,70 +85,93 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="register-page">
-      <div className="register-container">
-        <h1>Create an Account</h1>
+    <Center minH="80vh" py={12}>
+      <Container maxW="md" p={0}>
+        <Card p={8}>
+          <VStack spacing={6} align="stretch">
+            <Heading as="h1" size="xl" textAlign="center">
+              Create an Account
+            </Heading>
 
-        {error && <div className="error-message">{error}</div>}
+            {error && (
+              <Alert status="error" borderRadius="md" bg="red.800" color="white">
+                <AlertIcon />
+                {error}
+              </Alert>
+            )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              placeholder="your.email@example.com"
-            />
-          </div>
+            <form onSubmit={handleSubmit}>
+              <VStack spacing={4}>
+                <FormControl isRequired>
+                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    isDisabled={isLoading}
+                    placeholder="your.email@example.com"
+                  />
+                </FormControl>
 
-          <div className="form-group">
-            <label htmlFor="fullName">Full Name</label>
-            <input
-              id="fullName"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              disabled={isLoading}
-              placeholder="John Doe"
-            />
-          </div>
+                <FormControl isRequired>
+                  <FormLabel htmlFor="fullName">Full Name</FormLabel>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    isDisabled={isLoading}
+                    placeholder="John Doe"
+                  />
+                </FormControl>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              placeholder="Minimum 8 characters"
-            />
-          </div>
+                <FormControl isRequired>
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    isDisabled={isLoading}
+                    placeholder="Minimum 8 characters"
+                  />
+                </FormControl>
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={isLoading}
-              placeholder="Confirm your password"
-            />
-          </div>
+                <FormControl isRequired>
+                  <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    isDisabled={isLoading}
+                    placeholder="Confirm your password"
+                  />
+                </FormControl>
 
-          <button type="submit" className="register-button" disabled={isLoading}>
-            {isLoading ? 'Creating Account...' : 'Create Account'}
-          </button>
-        </form>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  isLoading={isLoading}
+                  loadingText="Creating Account..."
+                  width="full"
+                  mt={4}
+                >
+                  Create Account
+                </Button>
+              </VStack>
+            </form>
 
-        <div className="auth-links">
-          Already have an account? <Link to="/login">Log in</Link>
-        </div>
-      </div>
-    </div>
+            <Text textAlign="center" fontSize="sm" mt={4}>
+              Already have an account?{' '}
+              <Link as={RouterLink} to="/login" color="blue.300" _hover={{ color: 'blue.200' }}>
+                Log in
+              </Link>
+            </Text>
+          </VStack>
+        </Card>
+      </Container>
+    </Center>
   );
 };

@@ -1,7 +1,17 @@
 import { ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import '../styles/Layout.css'
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  HStack,
+  Heading,
+  Link,
+  Text,
+  useColorModeValue
+} from '@chakra-ui/react'
 
 interface LayoutProps {
   children: ReactNode
@@ -17,43 +27,61 @@ export const Layout = ({ children }: LayoutProps) => {
   }
 
   return (
-    <div className="layout">
-      <header className="header">
-        <div className="container">
-          <div className="navbar">
-            <h1 className="logo">
-              <Link to="/">AlgoSuite</Link>
-            </h1>
-            <nav className="nav">
-              <Link to="/" className="nav-link">Home</Link>
-              <Link to="/about" className="nav-link">About</Link>
+    <Flex direction="column" minH="100vh">
+      <Box as="header" bg="background.card" py={4}>
+        <Container maxW="container.xl">
+          <Flex justify="space-between" align="center">
+            <Heading as="h1" size="lg" m={0}>
+              <Link as={RouterLink} to="/" _hover={{ textDecoration: 'none' }}>
+                AlgoSuite
+              </Link>
+            </Heading>
+            <HStack spacing={6} align="center">
+              <Link as={RouterLink} to="/" _hover={{ color: 'white' }}>
+                Home
+              </Link>
+              <Link as={RouterLink} to="/about" _hover={{ color: 'white' }}>
+                About
+              </Link>
               {authState.isAuthenticated ? (
                 <>
-                  <span className="user-info">
+                  <Text fontSize="sm" color="text.secondary">
                     {authState.user?.email || 'User'}
-                  </span>
-                  <button onClick={handleLogout} className="logout-button">
+                  </Text>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                  >
                     Logout
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="nav-link">Login</Link>
-                  <Link to="/register" className="nav-link">Register</Link>
+                  <Link as={RouterLink} to="/login" _hover={{ color: 'white' }}>
+                    Login
+                  </Link>
+                  <Link as={RouterLink} to="/register" _hover={{ color: 'white' }}>
+                    Register
+                  </Link>
                 </>
               )}
-            </nav>
-          </div>
-        </div>
-      </header>
-      <main className="main container">
-        {children}
-      </main>
-      <footer className="footer">
-        <div className="container">
-          <p>© {new Date().getFullYear()} AlgoSuite. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+            </HStack>
+          </Flex>
+        </Container>
+      </Box>
+      <Box as="main" flex="1" py={8}>
+        <Container maxW="container.xl">
+          {children}
+        </Container>
+      </Box>
+      <Box as="footer" bg="background.card" py={4} textAlign="center">
+        <Container maxW="container.xl">
+          <Text fontSize="sm" color="text.secondary">
+            © {new Date().getFullYear()} AlgoSuite. All rights reserved.
+          </Text>
+        </Container>
+      </Box>
+    </Flex>
   )
 }
