@@ -1,23 +1,19 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import {
-  Box,
   Button,
   Center,
   Container,
-  FormControl,
-  FormLabel,
   Heading,
   Input,
-  Link,
   Text,
-  VStack,
   Alert,
-  AlertIcon,
-  FormErrorMessage
 } from '@chakra-ui/react';
 import { Card } from '../components/Card';
+import { VStack } from '../components/ui/stack';
+import { NavLink as Link } from '../components/ui/link';
+import { Field } from '@chakra-ui/react';
 
 export const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -75,49 +71,49 @@ export const LoginPage = () => {
             </Heading>
 
             {error && (
-              <Alert status="error" borderRadius="md" bg="red.800" color="white">
-                <AlertIcon />
-                {error}
-              </Alert>
+              <Alert.Root status="error" borderRadius="md" bg="red.800" color="white">
+                <Alert.Indicator />
+                <Alert.Content>{error}</Alert.Content>
+              </Alert.Root>
             )}
 
             {successMessage && (
-              <Alert status="success" borderRadius="md" bg="green.800" color="white">
-                <AlertIcon />
-                {successMessage}
-              </Alert>
+              <Alert.Root status="success" borderRadius="md" bg="green.800" color="white">
+                <Alert.Indicator />
+                <Alert.Content>{successMessage}</Alert.Content>
+              </Alert.Root>
             )}
 
             <form onSubmit={handleSubmit}>
               <VStack spacing={4}>
-                <FormControl isRequired>
-                  <FormLabel htmlFor="username">Username</FormLabel>
+                <Field.Root required>
+                  <Field.Label htmlFor="username">Username</Field.Label>
                   <Input
                     id="username"
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                     placeholder="Enter your username"
                   />
-                </FormControl>
+                </Field.Root>
 
-                <FormControl isRequired>
-                  <FormLabel htmlFor="password">Password</FormLabel>
+                <Field.Root required>
+                  <Field.Label htmlFor="password">Password</Field.Label>
                   <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                     placeholder="Enter your password"
                   />
-                </FormControl>
+                </Field.Root>
 
                 <Button
                   type="submit"
-                  variant="primary"
-                  isLoading={isLoading}
+                  variant="solid"
+                  loading={isLoading}
                   loadingText="Logging in..."
                   width="full"
                   mt={4}
@@ -129,7 +125,7 @@ export const LoginPage = () => {
 
             <Text textAlign="center" fontSize="sm" mt={4}>
               Don't have an account?{' '}
-              <Link as={RouterLink} to="/register" color="blue.300" _hover={{ color: 'blue.200' }}>
+              <Link to="/register" color="blue.300" _hover={{ color: 'blue.200' }}>
                 Sign up
               </Link>
             </Text>

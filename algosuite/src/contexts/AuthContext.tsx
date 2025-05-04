@@ -1,18 +1,22 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { api } from '../api/apiClient';
-import { User, AuthState } from '../types';
+import { AuthContext } from './auth-context-type';
 
-// Define the shape of the auth context
-interface AuthContextType {
-  authState: AuthState;
-  login: (username: string, password: string) => Promise<void>;
-  register: (email: string, fullName: string, password: string) => Promise<any>;
-  logout: () => Promise<void>;
-  refreshToken: () => Promise<any>;
+// User type
+interface User {
+  id: string;
+  email: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  full_name: string;
 }
 
-// Create the auth context with a default value
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Auth state type
+interface AuthState {
+  isAuthenticated: boolean;
+  token: string | null;
+  user: User | null;
+}
 
 // Auth provider props
 interface AuthProviderProps {
@@ -196,7 +200,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
 
       // Update auth state
-      setAuthState(prev => ({
+      setAuthState((prev: AuthState) => ({
         ...prev,
         token: data.access_token,
       }));
@@ -219,13 +223,4 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 };
 
-// Custom hook to use the auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
 
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-
-  return context;
-};

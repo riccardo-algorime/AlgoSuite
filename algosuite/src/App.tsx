@@ -7,14 +7,14 @@ import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './contexts/AuthContext'
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
+import { ColorModeProvider } from './components/ui/color-mode'
 import theme from './theme'
 
 function App() {
   return (
-    <>
-      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-      <ChakraProvider theme={theme}>
+    <ChakraProvider value={theme}>
+      <ColorModeProvider>
         <AuthProvider>
           <Layout>
             <Routes>
@@ -33,8 +33,8 @@ function App() {
             </Routes>
           </Layout>
         </AuthProvider>
-      </ChakraProvider>
-    </>
+      </ColorModeProvider>
+    </ChakraProvider>
   )
 }
 

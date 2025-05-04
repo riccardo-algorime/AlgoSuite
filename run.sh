@@ -9,8 +9,8 @@ NC='\033[0m' # No Color
 
 # Function to display help message
 show_help() {
-    echo -e "${BLUE}AlgoSuite4 Runner Script${NC}"
-    echo -e "This script helps you run AlgoSuite4 components individually or all at once."
+    echo -e "${BLUE}algosuite_test_3 Runner Script${NC}"
+    echo -e "This script helps you run algosuite_test_3 components individually or all at once."
     echo
     echo -e "Usage: ./run.sh [OPTION]"
     echo
@@ -38,7 +38,7 @@ show_help() {
 
 # Function to list all components
 list_components() {
-    echo -e "${BLUE}AlgoSuite4 Components:${NC}"
+    echo -e "${BLUE}algosuite_test_3 Components:${NC}"
     echo -e "  ${GREEN}Backend (FastAPI)${NC}"
     echo -e "    - API server for AlgoSuite"
     echo -e "    - Runs on port 8000"
@@ -74,7 +74,7 @@ check_status() {
     # Check Docker services
     if command -v docker &> /dev/null; then
         echo -e "${YELLOW}Docker services:${NC}"
-        docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E 'algosuite4|backend|frontend|db|redis|keycloak|celery'
+        docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E 'algosuite_test_3|backend|frontend|db|redis|keycloak|celery'
     else
         echo -e "${RED}Docker not found. Cannot check Docker service status.${NC}"
     fi
@@ -94,14 +94,14 @@ check_status() {
     fi
 
     # Check if database is running (using docker exec instead of lsof)
-    if docker exec algosuite4-db-1 psql -U postgres -c "SELECT 1" &> /dev/null; then
+    if docker exec algosuite_test_3-db-1 psql -U postgres -c "SELECT 1" &> /dev/null; then
         echo -e "${GREEN}Database:${NC} Running on port 5432"
     else
         echo -e "${RED}Database:${NC} Not running"
     fi
 
     # Check if Redis is running (using docker exec instead of lsof)
-    if docker exec algosuite4-redis-1 redis-cli ping &> /dev/null; then
+    if docker exec algosuite_test_3-redis-1 redis-cli ping &> /dev/null; then
         echo -e "${GREEN}Redis:${NC} Running on port 6379"
     else
         echo -e "${RED}Redis:${NC} Not running"
@@ -117,7 +117,7 @@ check_status() {
 
 # Function to start all services using docker-compose
 start_all() {
-    echo -e "${BLUE}Starting all AlgoSuite4 services...${NC}"
+    echo -e "${BLUE}Starting all algosuite_test_3 services...${NC}"
 
     # Start the database first
     docker-compose up -d db
@@ -127,8 +127,8 @@ start_all() {
 
     # Create the keycloak database if it doesn't exist
     echo -e "${YELLOW}Ensuring keycloak database exists...${NC}"
-    docker exec algosuite4-db-1 psql -U postgres -c "SELECT 1 FROM pg_database WHERE datname = 'keycloak'" | grep -q 1 || \
-    docker exec algosuite4-db-1 psql -U postgres -c "CREATE DATABASE keycloak;"
+    docker exec algosuite_test_3-db-1 psql -U postgres -c "SELECT 1 FROM pg_database WHERE datname = 'keycloak'" | grep -q 1 || \
+    docker exec algosuite_test_3-db-1 psql -U postgres -c "CREATE DATABASE keycloak;"
 
     # Start the remaining services
     docker-compose up -d
@@ -185,7 +185,7 @@ start_keycloak() {
     echo -e "${BLUE}Starting Keycloak service...${NC}"
 
     # Start the database first if it's not already running
-    if ! docker ps | grep -q algosuite4-db-1; then
+    if ! docker ps | grep -q algosuite_test_3-db-1; then
         echo -e "${YELLOW}Starting database service first...${NC}"
         docker-compose up -d db
         sleep 5
@@ -193,8 +193,8 @@ start_keycloak() {
 
     # Create the keycloak database if it doesn't exist
     echo -e "${YELLOW}Ensuring keycloak database exists...${NC}"
-    docker exec algosuite4-db-1 psql -U postgres -c "SELECT 1 FROM pg_database WHERE datname = 'keycloak'" | grep -q 1 || \
-    docker exec algosuite4-db-1 psql -U postgres -c "CREATE DATABASE keycloak;"
+    docker exec algosuite_test_3-db-1 psql -U postgres -c "SELECT 1 FROM pg_database WHERE datname = 'keycloak'" | grep -q 1 || \
+    docker exec algosuite_test_3-db-1 psql -U postgres -c "CREATE DATABASE keycloak;"
 
     # Start Keycloak
     docker-compose up -d keycloak

@@ -31,7 +31,7 @@ export const FeatureSection = () => {
       <Heading as="h2" size="xl" textAlign="center" mb={8}>
         Our Features
       </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8}>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={8}>
         {features.map((feature, index) => (
           <Card key={index} title={feature.title}>
             <Text>{feature.description}</Text>

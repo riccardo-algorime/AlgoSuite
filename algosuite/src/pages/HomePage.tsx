@@ -2,14 +2,12 @@ import {
   Box,
   Button,
   Container,
-  Flex,
-  Grid,
   Heading,
   SimpleGrid,
-  Text,
-  VStack
+  Text
 } from '@chakra-ui/react'
 import { Card } from '../components/Card'
+import { VStack } from '../components/ui/stack'
 
 export const HomePage = () => {
   return (
@@ -46,7 +44,7 @@ export const HomePage = () => {
                 AlgoSuite provides a comprehensive set of tools to help you analyze data,
                 optimize processes, and make better decisions.
               </Text>
-              <Button variant="primary" size="lg">
+              <Button variant="solid" size="lg">
                 Explore Features
               </Button>
             </VStack>
@@ -59,7 +57,7 @@ export const HomePage = () => {
           <Heading as="h2" size="xl" textAlign="center" mb={10}>
             Our Features
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={8}>
             <Card title="Data Analysis">
               <Text>Powerful tools for analyzing complex datasets and extracting valuable insights.</Text>
             </Card>

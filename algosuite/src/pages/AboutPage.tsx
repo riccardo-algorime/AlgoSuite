@@ -1,12 +1,12 @@
 import {
   Box,
   Container,
-  Divider,
   Heading,
-  Link,
   Text,
-  VStack
+  Separator
 } from '@chakra-ui/react'
+import { VStack } from '../components/ui/stack'
+import { Link } from '../components/ui/link'
 
 export const AboutPage = () => {
   return (
@@ -34,7 +34,7 @@ export const AboutPage = () => {
           </Text>
         </Box>
 
-        <Divider borderColor="border.subtle" />
+        <Separator borderColor="border.subtle" />
 
         <Box as="section">
           <Heading as="h2" size="xl" mb={4}>

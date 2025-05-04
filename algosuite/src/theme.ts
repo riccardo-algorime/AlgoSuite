@@ -1,265 +1,135 @@
-import { extendTheme, type ThemeConfig } from '@chakra-ui/react'
+import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 
-// Color mode configuration
-const config: ThemeConfig = {
-  initialColorMode: 'dark',
-  useSystemColorMode: false,
+// Color mode configuration will be set in the ColorModeProvider
+
+// Define semantic tokens for light/dark mode
+const semanticTokens = {
+  colors: {
+    "background.page": {
+      value: { base: '#F7FAFC', _dark: '#0A0A0A' },
+    },
+    "background.card": {
+      value: { base: '#FFFFFF', _dark: '#1A1A1A' },
+    },
+    "background.input": {
+      value: { base: '#EDF2F7', _dark: '#2C2C2C' },
+    },
+    "text.primary": {
+      value: { base: '#1A202C', _dark: '#F0F0F0' },
+    },
+    "text.secondary": {
+      value: { base: '#4A5568', _dark: '#A0AEC0' },
+    },
+    "text.placeholder": {
+      value: { base: '#A0AEC0', _dark: '#718096' },
+    },
+    "border.subtle": {
+      value: { base: '#E2E8F0', _dark: '#333333' },
+    },
+    "button.primary.bg": {
+      value: { base: '#3182CE', _dark: '#F0F0F0' },
+    },
+    "button.primary.text": {
+      value: { base: '#FFFFFF', _dark: '#1A1A1A' },
+    },
+    "button.secondary.bg": {
+      value: { base: 'transparent', _dark: 'transparent' },
+    },
+    "button.secondary.text": {
+      value: { base: '#3182CE', _dark: '#F0F0F0' },
+    },
+    "button.secondary.border": {
+      value: { base: '#CBD5E0', _dark: '#333333' },
+    },
+  },
 }
 
-// Define color palette
-const colors = {
-  background: {
-    page: '#0A0A0A',
-    card: '#1A1A1A',
-    input: '#2C2C2C',
-  },
-  text: {
-    primary: '#F0F0F0',
-    secondary: '#A0AEC0',
-    placeholder: '#718096',
-  },
-  border: {
-    subtle: '#333333',
-  },
-  button: {
-    primary: {
-      bg: '#F0F0F0',
-      text: '#1A1A1A',
-    },
-    secondary: {
-      bg: 'transparent',
-      text: '#F0F0F0',
-      border: '#333333',
-    },
-  },
-}
-
-// Define typography
-const typography = {
+// Define tokens
+const tokens = {
   fonts: {
-    body: 'Inter, system-ui, sans-serif',
-    heading: 'Inter, system-ui, sans-serif',
+    body: { value: 'Inter, system-ui, sans-serif' },
+    heading: { value: 'Inter, system-ui, sans-serif' },
   },
   fontSizes: {
-    xs: '0.75rem',
-    sm: '0.875rem',
-    md: '1rem',
-    lg: '1.125rem',
-    xl: '1.25rem',
-    '2xl': '1.5rem',
-    '3xl': '1.875rem',
-    '4xl': '2.25rem',
-    '5xl': '3rem',
+    xs: { value: '0.75rem' },
+    sm: { value: '0.875rem' },
+    md: { value: '1rem' },
+    lg: { value: '1.125rem' },
+    xl: { value: '1.25rem' },
+    '2xl': { value: '1.5rem' },
+    '3xl': { value: '1.875rem' },
+    '4xl': { value: '2.25rem' },
+    '5xl': { value: '3rem' },
   },
   fontWeights: {
-    normal: 400,
-    medium: 500,
-    semibold: 600,
-    bold: 700,
+    normal: { value: 400 },
+    medium: { value: 500 },
+    semibold: { value: 600 },
+    bold: { value: 700 },
   },
   lineHeights: {
-    normal: 'normal',
-    none: 1,
-    shorter: 1.25,
-    short: 1.375,
-    base: 1.5,
-    tall: 1.625,
-    taller: 2,
+    normal: { value: 'normal' },
+    none: { value: 1 },
+    shorter: { value: 1.25 },
+    short: { value: 1.375 },
+    base: { value: 1.5 },
+    tall: { value: 1.625 },
+    taller: { value: 2 },
+  },
+  spacing: {
+    px: { value: '1px' },
+    '0.5': { value: '0.125rem' },
+    '1': { value: '0.25rem' },
+    '1.5': { value: '0.375rem' },
+    '2': { value: '0.5rem' },
+    '2.5': { value: '0.625rem' },
+    '3': { value: '0.75rem' },
+    '3.5': { value: '0.875rem' },
+    '4': { value: '1rem' },
+    '5': { value: '1.25rem' },
+    '6': { value: '1.5rem' },
+    '8': { value: '2rem' },
+    '10': { value: '2.5rem' },
+    '12': { value: '3rem' },
+    '16': { value: '4rem' },
+    '20': { value: '5rem' },
+    '24': { value: '6rem' },
+    '32': { value: '8rem' },
+    '40': { value: '10rem' },
+    '48': { value: '12rem' },
+    '56': { value: '14rem' },
+    '64': { value: '16rem' },
+  },
+  radii: {
+    none: { value: '0' },
+    sm: { value: '0.125rem' },
+    base: { value: '0.25rem' },
+    md: { value: '0.375rem' },
+    lg: { value: '0.5rem' },
+    xl: { value: '0.75rem' },
+    '2xl': { value: '1rem' },
+    '3xl': { value: '1.5rem' },
+    full: { value: '9999px' },
   },
 }
 
-// Define spacing
-const spacing = {
-  space: {
-    px: '1px',
-    0.5: '0.125rem',
-    1: '0.25rem',
-    1.5: '0.375rem',
-    2: '0.5rem',
-    2.5: '0.625rem',
-    3: '0.75rem',
-    3.5: '0.875rem',
-    4: '1rem',
-    5: '1.25rem',
-    6: '1.5rem',
-    8: '2rem',
-    10: '2.5rem',
-    12: '3rem',
-    16: '4rem',
-    20: '5rem',
-    24: '6rem',
-    32: '8rem',
-    40: '10rem',
-    48: '12rem',
-    56: '14rem',
-    64: '16rem',
-  },
-}
+// Note: Component styles and global styles are commented out for now
+// They need to be converted to the new Chakra UI v3 format in a future update
+/*
+// Component styles would be defined using defineRecipe or defineSlotRecipe
+// Global styles would be defined in the theme config
+*/
 
-// Define border radius
-const radii = {
-  none: '0',
-  sm: '0.125rem',
-  base: '0.25rem',
-  md: '0.375rem',
-  lg: '0.5rem',
-  xl: '0.75rem',
-  '2xl': '1rem',
-  '3xl': '1.5rem',
-  full: '9999px',
-}
-
-// Component styles
-const components = {
-  Button: {
-    baseStyle: {
-      fontWeight: 'semibold',
-      borderRadius: 'md',
-    },
-    variants: {
-      primary: {
-        bg: 'button.primary.bg',
-        color: 'button.primary.text',
-        _hover: {
-          bg: 'gray.200',
-        },
-      },
-      secondary: {
-        bg: 'button.secondary.bg',
-        color: 'button.secondary.text',
-        border: '1px solid',
-        borderColor: 'button.secondary.border',
-        _hover: {
-          borderColor: 'text.primary',
-        },
-      },
-      outline: {
-        bg: 'transparent',
-        color: 'text.primary',
-        border: '1px solid',
-        borderColor: 'border.subtle',
-        _hover: {
-          bg: 'rgba(255, 255, 255, 0.05)',
-        },
-      },
-    },
-    defaultProps: {
-      variant: 'primary',
-      size: 'md',
-    },
+// Create the theme system
+const customConfig = defineConfig({
+  theme: {
+    semanticTokens,
+    tokens,
   },
-  Input: {
-    variants: {
-      outline: {
-        field: {
-          bg: 'background.input',
-          borderColor: 'border.subtle',
-          color: 'text.primary',
-          _placeholder: {
-            color: 'text.placeholder',
-          },
-          _hover: {
-            borderColor: 'gray.500',
-          },
-          _focus: {
-            borderColor: 'gray.400',
-            boxShadow: 'none',
-          },
-        },
-      },
-    },
-    defaultProps: {
-      variant: 'outline',
-    },
-  },
-  Textarea: {
-    variants: {
-      outline: {
-        bg: 'background.input',
-        borderColor: 'border.subtle',
-        color: 'text.primary',
-        _placeholder: {
-          color: 'text.placeholder',
-        },
-        _hover: {
-          borderColor: 'gray.500',
-        },
-        _focus: {
-          borderColor: 'gray.400',
-          boxShadow: 'none',
-        },
-      },
-    },
-    defaultProps: {
-      variant: 'outline',
-    },
-  },
-  Card: {
-    baseStyle: {
-      container: {
-        bg: 'background.card',
-        borderRadius: 'lg',
-        p: 6,
-        boxShadow: 'md',
-      },
-    },
-  },
-  FormLabel: {
-    baseStyle: {
-      color: 'text.secondary',
-      fontSize: 'sm',
-      fontWeight: 'medium',
-      mb: 1,
-    },
-  },
-  FormError: {
-    baseStyle: {
-      text: {
-        color: 'red.300',
-        fontSize: 'sm',
-        mt: 1,
-      },
-    },
-  },
-  Link: {
-    baseStyle: {
-      color: 'text.primary',
-      _hover: {
-        textDecoration: 'none',
-        color: 'white',
-      },
-    },
-  },
-}
-
-// Global styles
-const styles = {
-  global: {
-    body: {
-      bg: 'background.page',
-      color: 'text.primary',
-      fontFamily: 'body',
-      lineHeight: 'base',
-    },
-    a: {
-      color: 'text.primary',
-      textDecoration: 'none',
-      _hover: {
-        textDecoration: 'none',
-      },
-    },
-  },
-}
-
-// Extend the theme
-const theme = extendTheme({
-  config,
-  colors,
-  ...typography,
-  ...spacing,
-  radii,
-  components,
-  styles,
+  // We'll need to convert components and styles to the new format in a future update
+  // For now, we'll use the basic configuration
 })
+
+const theme = createSystem(defaultConfig, customConfig)
 
 export default theme

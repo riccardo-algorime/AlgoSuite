@@ -1,23 +1,19 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import {
-  Box,
   Button,
   Center,
   Container,
-  FormControl,
-  FormLabel,
   Heading,
   Input,
-  Link,
   Text,
-  VStack,
-  Alert,
-  AlertIcon,
-  FormErrorMessage
+  Alert
 } from '@chakra-ui/react';
+import { FormControl, FormLabel } from '../components/ui/form';
 import { Card } from '../components/Card';
+import { VStack } from '../components/ui/stack';
+import { NavLink as Link } from '../components/ui/link';
 
 export const RegisterPage = () => {
   const [email, setEmail] = useState('');
@@ -88,20 +84,20 @@ export const RegisterPage = () => {
     <Center minH="80vh" py={12}>
       <Container maxW="md" p={0}>
         <Card p={8}>
-          <VStack spacing={6} align="stretch">
+          <VStack gap={6} align="stretch">
             <Heading as="h1" size="xl" textAlign="center">
               Create an Account
             </Heading>
 
             {error && (
-              <Alert status="error" borderRadius="md" bg="red.800" color="white">
-                <AlertIcon />
-                {error}
-              </Alert>
+              <Alert.Root status="error" borderRadius="md" bg="red.800" color="white">
+                <Alert.Indicator />
+                <Alert.Content>{error}</Alert.Content>
+              </Alert.Root>
             )}
 
             <form onSubmit={handleSubmit}>
-              <VStack spacing={4}>
+              <VStack gap={4}>
                 <FormControl isRequired>
                   <FormLabel htmlFor="email">Email</FormLabel>
                   <Input
@@ -109,7 +105,7 @@ export const RegisterPage = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                     placeholder="your.email@example.com"
                   />
                 </FormControl>
@@ -121,7 +117,7 @@ export const RegisterPage = () => {
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                     placeholder="John Doe"
                   />
                 </FormControl>
@@ -133,7 +129,7 @@ export const RegisterPage = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                     placeholder="Minimum 8 characters"
                   />
                 </FormControl>
@@ -145,15 +141,15 @@ export const RegisterPage = () => {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    isDisabled={isLoading}
+                    disabled={isLoading}
                     placeholder="Confirm your password"
                   />
                 </FormControl>
 
                 <Button
                   type="submit"
-                  variant="primary"
-                  isLoading={isLoading}
+                  variant="solid"
+                  loading={isLoading}
                   loadingText="Creating Account..."
                   width="full"
                   mt={4}
@@ -165,7 +161,7 @@ export const RegisterPage = () => {
 
             <Text textAlign="center" fontSize="sm" mt={4}>
               Already have an account?{' '}
-              <Link as={RouterLink} to="/login" color="blue.300" _hover={{ color: 'blue.200' }}>
+              <Link to="/login" color="blue.300" _hover={{ color: 'blue.200' }}>
                 Log in
               </Link>
             </Text>

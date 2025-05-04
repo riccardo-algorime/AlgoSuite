@@ -3,14 +3,9 @@ import {
   Input,
   Textarea,
   VStack,
-  Box,
-  Text,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Alert,
-  AlertIcon
+  Alert
 } from '@chakra-ui/react'
+import { FormControl, FormLabel, FormErrorMessage } from './ui/form'
 import { useState } from 'react'
 
 interface FormData {
@@ -89,7 +84,7 @@ export const ContactForm = () => {
       setTimeout(() => {
         setNotification({ message: '', type: null })
       }, 5000)
-    } catch (error) {
+    } catch {
       setNotification({
         message: 'Failed to send message. Please try again.',
         type: 'error'
@@ -106,18 +101,18 @@ export const ContactForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <VStack spacing={6} align="stretch">
+      <VStack gap={6} align="stretch">
         {notification.message && (
-          <Alert
+          <Alert.Root
             status={notification.type === 'success' ? 'success' : 'error'}
             variant="subtle"
             borderRadius="md"
             bg={notification.type === 'success' ? 'green.800' : 'red.800'}
             color="white"
           >
-            <AlertIcon />
-            {notification.message}
-          </Alert>
+            <Alert.Indicator />
+            <Alert.Content>{notification.message}</Alert.Content>
+          </Alert.Root>
         )}
 
         <FormControl isInvalid={!!errors.name}>
@@ -160,8 +155,8 @@ export const ContactForm = () => {
 
         <Button
           type="submit"
-          variant="primary"
-          isLoading={isSubmitting}
+          variant="solid"
+          loading={isSubmitting}
           loadingText="Sending"
           size="md"
           width="full"

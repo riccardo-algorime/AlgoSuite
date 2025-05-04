@@ -1,10 +1,8 @@
-import { Link as RouterLink } from 'react-router-dom'
+
 import {
-  Box,
   Button,
   Center,
   Heading,
-  Link,
   Text,
   VStack
 } from '@chakra-ui/react'
@@ -12,7 +10,7 @@ import {
 export const NotFoundPage = () => {
   return (
     <Center minH="60vh">
-      <VStack spacing={6} textAlign="center" p={8}>
+      <VStack gap={6} textAlign="center" p={8}>
         <Heading as="h1" size="4xl" color="text.primary">
           404
         </Heading>
@@ -23,10 +21,9 @@ export const NotFoundPage = () => {
           The page you are looking for doesn't exist or has been moved.
         </Text>
         <Button
-          as={RouterLink}
-          to="/"
-          variant="primary"
+          variant="solid"
           size="lg"
+          onClick={() => window.location.href = '/'}
         >
           Go Home
         </Button>

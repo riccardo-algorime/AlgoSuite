@@ -1,5 +1,6 @@
-import { Box, BoxProps, Heading, Text, VStack } from '@chakra-ui/react'
+import { Box, BoxProps, Heading, Text } from '@chakra-ui/react'
 import { ReactNode } from 'react'
+import { VStack } from './ui/stack'
 
 interface CardProps extends BoxProps {
   title?: string

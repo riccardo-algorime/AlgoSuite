@@ -1,17 +1,17 @@
 import { ReactNode } from 'react'
-import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 import {
   Box,
   Button,
   Container,
   Flex,
-  HStack,
   Heading,
-  Link,
-  Text,
-  useColorModeValue
+  Text
 } from '@chakra-ui/react'
+import { ThemeToggle } from './ThemeToggle'
+import { HStack } from './ui/stack'
+import { NavLink } from './ui/link'
 
 interface LayoutProps {
   children: ReactNode
@@ -32,17 +32,17 @@ export const Layout = ({ children }: LayoutProps) => {
         <Container maxW="container.xl">
           <Flex justify="space-between" align="center">
             <Heading as="h1" size="lg" m={0}>
-              <Link as={RouterLink} to="/" _hover={{ textDecoration: 'none' }}>
+              <NavLink to="/" _hover={{ textDecoration: 'none' }}>
                 AlgoSuite
-              </Link>
+              </NavLink>
             </Heading>
             <HStack spacing={6} align="center">
-              <Link as={RouterLink} to="/" _hover={{ color: 'white' }}>
+              <NavLink to="/">
                 Home
-              </Link>
-              <Link as={RouterLink} to="/about" _hover={{ color: 'white' }}>
+              </NavLink>
+              <NavLink to="/about">
                 About
-              </Link>
+              </NavLink>
               {authState.isAuthenticated ? (
                 <>
                   <Text fontSize="sm" color="text.secondary">
@@ -58,14 +58,15 @@ export const Layout = ({ children }: LayoutProps) => {
                 </>
               ) : (
                 <>
-                  <Link as={RouterLink} to="/login" _hover={{ color: 'white' }}>
+                  <NavLink to="/login">
                     Login
-                  </Link>
-                  <Link as={RouterLink} to="/register" _hover={{ color: 'white' }}>
+                  </NavLink>
+                  <NavLink to="/register">
                     Register
-                  </Link>
+                  </NavLink>
                 </>
               )}
+              <ThemeToggle />
             </HStack>
           </Flex>
         </Container>
