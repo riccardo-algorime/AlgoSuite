@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str
 
     # OpenAI
-    OPENAI_API_KEY: str
+    OPENAI_API_KEY: str = "sk-dummy-key-for-development-only"
 
 
 # Create settings instance

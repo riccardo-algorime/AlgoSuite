@@ -38,6 +38,7 @@ services:
       - KEYCLOAK_REALM=master
       - KEYCLOAK_CLIENT_ID=algosuite-backend
       - KEYCLOAK_CLIENT_SECRET=development_client_secret
+      - OPENAI_API_KEY=sk-dummy-key-for-development-only
     depends_on:
       - db
       - redis
@@ -56,6 +57,14 @@ services:
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - SECRET_KEY=development_secret_key
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - KEYCLOAK_URL=http://localhost:8080
+      - KEYCLOAK_REALM=master
+      - KEYCLOAK_CLIENT_ID=algosuite-backend
+      - KEYCLOAK_CLIENT_SECRET=development_client_secret
+      - OPENAI_API_KEY=sk-dummy-key-for-development-only
     depends_on:
       - backend
       - redis

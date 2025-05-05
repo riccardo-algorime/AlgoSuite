@@ -62,3 +62,12 @@ celerybeat.pid
 
 # DO NOT ignore .env files (private repo)
 # .env
+
+# Added by Claude Task Master
+# Environment variables
+.env
+.idea
+.vscode
+# Task files
+tasks.json
+tasks/ 
