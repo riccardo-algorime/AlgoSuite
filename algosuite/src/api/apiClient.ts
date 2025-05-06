@@ -7,6 +7,9 @@ const defaultHeaders = new Headers({
   'Content-Type': 'application/json',
 });
 
+// Store auth token for reuse
+let authToken: string | null = null;
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
 }
@@ -30,11 +33,24 @@ export async function apiRequest<T>(
     url += `?${searchParams.toString()}`;
   }
 
-  // Set default headers
-  const headers = new Headers(options.headers || defaultHeaders);
+  // Create a new Headers object for this specific request
+  const headers = new Headers(fetchOptions.headers || {});
+  
+  // Apply default headers if not overridden
   if (!headers.has('Content-Type') && options.method !== 'GET') {
     headers.set('Content-Type', 'application/json');
   }
+  
+  // Always apply the current auth token if available
+  if (authToken && !headers.has('Authorization')) {
+    console.log('Adding Authorization header with token:', authToken.substring(0, 10) + '...');
+    headers.set('Authorization', `Bearer ${authToken}`);
+  } else {
+    console.log('No auth token available for request to:', endpoint);
+  }
+
+  // Log the final headers for debugging
+  console.log('Request headers for', endpoint, ':', Object.fromEntries(headers.entries()));
 
   // Make the request
   const response = await fetch(url, {
@@ -45,6 +61,11 @@ export async function apiRequest<T>(
   // Handle non-2xx responses
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.error('API request failed:', {
+      url,
+      status: response.status,
+      error: errorData
+    });
     throw new Error(
       errorData.detail || errorData.message || `API request failed with status ${response.status}`
     );
@@ -58,12 +79,19 @@ export async function apiRequest<T>(
 export const api = {
   // Set auth header for all requests
   setAuthHeader: (token: string) => {
-    defaultHeaders.set('Authorization', `Bearer ${token}`);
+    console.log('Setting auth token:', token.substring(0, 10) + '...');
+    authToken = token;
   },
 
   // Remove auth header
   removeAuthHeader: () => {
-    defaultHeaders.delete('Authorization');
+    console.log('Removing auth token');
+    authToken = null;
+  },
+
+  // Get current auth token
+  getAuthToken: () => {
+    return authToken;
   },
 
   get: <T>(endpoint: string, options?: RequestOptions) =>
