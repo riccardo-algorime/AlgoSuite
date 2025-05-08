@@ -54,3 +54,41 @@ export interface PaginatedResponse<T> {
   data: T[];
   meta: PaginationMeta;
 }
+
+/**
+ * Surface types for attack surfaces
+ */
+export enum SurfaceType {
+  WEB = "web",
+  API = "api",
+  MOBILE = "mobile",
+  NETWORK = "network",
+  CLOUD = "cloud",
+  IOT = "iot",
+  OTHER = "other"
+}
+
+/**
+ * Project information
+ */
+export interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Attack Surface information
+ */
+export interface AttackSurface {
+  id: string;
+  project_id: string;
+  surface_type: SurfaceType;
+  description?: string;
+  config?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}

@@ -26,8 +26,13 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get the redirect path from location state or default to home
-  const from = (location.state as { from?: string })?.from || '/';
+  // Get the redirect path from location state or default to dashboard
+  // Handle both string path and full Location object for backward compatibility
+  const from = location.state?.from
+    ? typeof location.state.from === 'string'
+      ? location.state.from
+      : location.state.from.pathname
+    : '/dashboard';
 
   // Check for success message from registration
   useEffect(() => {

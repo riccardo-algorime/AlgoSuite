@@ -230,7 +230,7 @@ setup_keycloak() {
 
     # Run the Keycloak setup script
     echo -e "${YELLOW}Running Keycloak setup script...${NC}"
-    cd backend && source .venv/bin/activate && python ../scripts/setup_keycloak.py
+    python scripts/setup_keycloak.py
 
     echo -e "${GREEN}Keycloak setup completed!${NC}"
 }

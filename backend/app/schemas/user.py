@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
 # Shared properties
@@ -25,9 +25,8 @@ class UserUpdate(UserBase):
 # Properties shared by models stored in DB
 class UserInDBBase(UserBase):
     id: str
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Additional properties to return via API

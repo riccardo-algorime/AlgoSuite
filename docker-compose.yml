@@ -34,7 +34,7 @@ services:
       - SECRET_KEY=development_secret_key
       - ENVIRONMENT=development
       - DEBUG=True
-      - KEYCLOAK_URL=http://localhost:8080
+      - KEYCLOAK_URL=http://keycloak:8080
       - KEYCLOAK_REALM=master
       - KEYCLOAK_CLIENT_ID=algosuite-backend
       - KEYCLOAK_CLIENT_SECRET=development_client_secret
@@ -60,7 +60,7 @@ services:
       - SECRET_KEY=development_secret_key
       - ENVIRONMENT=development
       - DEBUG=True
-      - KEYCLOAK_URL=http://localhost:8080
+      - KEYCLOAK_URL=http://keycloak:8080
       - KEYCLOAK_REALM=master
       - KEYCLOAK_CLIENT_ID=algosuite-backend
       - KEYCLOAK_CLIENT_SECRET=development_client_secret

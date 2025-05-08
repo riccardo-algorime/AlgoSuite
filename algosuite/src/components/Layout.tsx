@@ -40,8 +40,16 @@ export const Layout = ({ children }: LayoutProps) => {
               <NavLink to="/">
                 Home
               </NavLink>
+              {authState.isAuthenticated && (
+                <NavLink to="/dashboard">
+                  Dashboard
+                </NavLink>
+              )}
               <NavLink to="/about">
                 About
+              </NavLink>
+              <NavLink to="/components">
+                Components
               </NavLink>
               {authState.isAuthenticated ? (
                 <>

@@ -53,10 +53,33 @@ backend/
 
 1. Clone the repository
 2. Create a `.env` file from `.env.example`
-3. Install dependencies:
+3. Install dependencies using the setup script:
 
 ```bash
+# Navigate to the backend directory
+cd backend
+
+# Run the setup script
+./setup_dev_env.sh
+
+# Activate the virtual environment
+source venv/bin/activate
+```
+
+Alternatively, you can install dependencies manually:
+
+```bash
+# Create a virtual environment
+python -m venv venv
+
+# Activate the virtual environment
+source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Ensure python-keycloak is installed with the correct version
+pip install python-keycloak==3.5.0
 ```
 
 ### Running the Application

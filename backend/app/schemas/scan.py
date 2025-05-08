@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional, Any
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 
 
 class ScanType(str, Enum):
@@ -48,9 +48,8 @@ class ScanInDBBase(ScanBase):
     created_by: str
     created_at: datetime
     updated_at: datetime
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Additional properties to return via API
@@ -94,6 +93,5 @@ class ScanResult(BaseModel):
     findings: List[Finding]
     summary: ScanResultSummary
     completed_at: datetime
-    
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)

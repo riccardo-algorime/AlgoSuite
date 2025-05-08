@@ -6,8 +6,18 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 export const NotFoundPage = () => {
+  const navigate = useNavigate()
+  const { authState } = useAuth()
+
+  const handleNavigation = () => {
+    // Navigate to dashboard if authenticated, otherwise to home
+    navigate(authState.isAuthenticated ? '/dashboard' : '/')
+  }
+
   return (
     <Center minH="60vh">
       <VStack gap={6} textAlign="center" p={8}>
@@ -23,9 +33,9 @@ export const NotFoundPage = () => {
         <Button
           variant="solid"
           size="lg"
-          onClick={() => window.location.href = '/'}
+          onClick={handleNavigation}
         >
-          Go Home
+          {authState.isAuthenticated ? 'Go to Dashboard' : 'Go Home'}
         </Button>
       </VStack>
     </Center>
