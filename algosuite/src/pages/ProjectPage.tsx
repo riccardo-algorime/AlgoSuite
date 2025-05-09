@@ -33,7 +33,7 @@ export const ProjectPage = () => {
   // Fetch attack surfaces for this project
   const {
     data: attackSurfaces,
-    isLoading: isLoadingSurfaces,
+    isLoading: isLoadingAttackSurfaces,
     isError: isErrorSurfaces,
     error: surfacesError,
   } = useProjectAttackSurfaces(projectId || '');
@@ -68,7 +68,7 @@ export const ProjectPage = () => {
   }
 
   // Loading state
-  if (isLoadingProject || isLoadingSurfaces) {
+  if (isLoadingProject) {
     return (
       <Container maxW="container.xl" py={8}>
         <Flex justify="center" align="center" minH="50vh">
@@ -83,12 +83,17 @@ export const ProjectPage = () => {
     return (
       <Container maxW="container.xl" py={8}>
         <VStack>
+          <Box>
+            <Button onClick={handleBackToDashboard} variant="outline" mb={4}>
+              Back to Dashboard
+            </Button>
+          </Box>
           <Heading as="h1" size="lg">
             Project Not Found
           </Heading>
           <Text>The project you're looking for could not be found or you don't have access to it.</Text>
-          <Button onClick={handleBackToDashboard}>
-            Back to Dashboard
+          <Button onClick={handleBackToDashboard} colorScheme="blue" mt={4}>
+            Return to Dashboard
           </Button>
         </VStack>
       </Container>
@@ -97,7 +102,7 @@ export const ProjectPage = () => {
 
   return (
     <Container maxW="container.xl" py={8}>
-      <VStack>
+      <VStack gap={6} align="stretch" width="100%">
         {/* Navigation */}
         <Box>
           <Button onClick={handleBackToDashboard} variant="outline" mb={4}>
@@ -106,32 +111,34 @@ export const ProjectPage = () => {
         </Box>
 
         {/* Project Header */}
-        <Box>
+        <Box width="100%">
           <Flex justify="space-between" align="center" mb={4}>
             <Heading as="h1" size="xl">
-              {project.name}
+              {project?.name || 'Untitled Project'}
             </Heading>
-            <Button onClick={handleBackToDashboard} variant="outline">
-              Back to Dashboard
-            </Button>
           </Flex>
-          {project.description && (
+          {project?.description && (
             <Text fontSize="lg" mb={4}>
               {project.description}
             </Text>
           )}
           <Box fontSize="sm" color="text.secondary" mb={6}>
-            <Text>Created: {formatDate(project.created_at)}</Text>
-            <Text>Last updated: {formatDate(project.updated_at)}</Text>
+            <Text>Created: {formatDate(project?.created_at)}</Text>
+            <Text>Last updated: {formatDate(project?.updated_at)}</Text>
           </Box>
         </Box>
 
         {/* Attack Surfaces Section */}
-        <Box>
+        <Box width="100%">
           <Heading as="h2" size="lg" mb={4}>
             Attack Surfaces
           </Heading>
-          {attackSurfaces && attackSurfaces.length > 0 ? (
+
+          {isLoadingAttackSurfaces ? (
+            <Flex justify="center" py={8}>
+              <Spinner size="md" color="blue.500" />
+            </Flex>
+          ) : attackSurfaces && attackSurfaces.length > 0 ? (
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
               {attackSurfaces.map((surface: AttackSurface) => (
                 <AttackSurfaceCard
