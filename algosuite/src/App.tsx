@@ -10,6 +10,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { ProjectPage } from './pages/ProjectPage'
 import { AttackSurfacePage } from './pages/AttackSurfacePage'
 import { CreateProjectPage } from './pages/CreateProjectPage'
+import { CreateAttackSurfacePage } from './pages/CreateAttackSurfacePage'
 import { EditProjectPage } from './pages/EditProjectPage'
 import { EditAttackSurfacePage } from './pages/EditAttackSurfacePage'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -95,6 +96,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <EditAttackSurfacePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/projects/:projectId/attack-surfaces/new"
+                  element={
+                    <ProtectedRoute>
+                      <CreateAttackSurfacePage />
                     </ProtectedRoute>
                   }
                 />

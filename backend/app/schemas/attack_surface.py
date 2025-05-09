@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict, Optional, Any
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, validator
 
 from app.models.attack_surface import SurfaceType
 
@@ -15,8 +15,22 @@ class AttackSurfaceBase(BaseModel):
 
 
 # Properties to receive via API on creation
-class AttackSurfaceCreate(AttackSurfaceBase):
-    pass
+class AttackSurfaceCreate(BaseModel):
+    # project_id is not required in the request body as it's taken from the URL path
+    surface_type: str = "web"  # Accept as string to handle case issues
+    description: Optional[str] = None
+    config: Optional[Dict[str, Any]] = None
+
+    # Validate and convert surface_type to lowercase
+    @validator('surface_type')
+    def lowercase_surface_type(cls, v):
+        print(f"Pydantic validator received surface_type: {v}, type: {type(v)}")
+        if isinstance(v, str):
+            lowercased = v.lower()
+            print(f"Pydantic validator converted to lowercase: {lowercased}")
+            return lowercased
+        print(f"Pydantic validator returning non-string value as-is: {v}")
+        return v
 
 
 # Properties to receive via API on update

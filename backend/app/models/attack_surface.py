@@ -15,19 +15,23 @@ class SurfaceType(str, Enum):
     IOT = "iot"
     OTHER = "other"
 
+    def __str__(self):
+        """Return the lowercase string value of the enum"""
+        return self.value
+
 
 class AttackSurface(BaseModel):
     """Attack Surface model"""
-    
+
     project_id = Column(String, ForeignKey("project.id"), nullable=False, index=True)
     surface_type = Column(
-        SQLAlchemyEnum(SurfaceType),
+        String,  # Use a string column instead of an enum
         nullable=False,
         index=True,
-        default=SurfaceType.WEB
+        default="web"  # Default to lowercase "web"
     )
     description = Column(Text, nullable=True)
     config = Column(JSON, nullable=True)
-    
+
     # Relationships
     project = relationship("Project", back_populates="attack_surfaces")

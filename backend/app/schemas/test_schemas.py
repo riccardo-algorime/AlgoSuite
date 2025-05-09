@@ -84,33 +84,30 @@ def test_attack_surface_create():
     """Test AttackSurfaceCreate schema"""
     # Valid data
     data = {
-        "project_id": "123e4567-e89b-12d3-a456-426614174000",
-        "surface_type": SurfaceType.WEB,
+        "surface_type": "web",
         "description": "Web application attack surface",
         "config": {"url": "https://example.com", "scope": "full"}
     }
     surface = AttackSurfaceCreate(**data)
-    assert surface.project_id == "123e4567-e89b-12d3-a456-426614174000"
-    assert surface.surface_type == SurfaceType.WEB
+    assert surface.surface_type == "web"
     assert surface.description == "Web application attack surface"
     assert surface.config == {"url": "https://example.com", "scope": "full"}
 
     # Default surface type
     surface = AttackSurfaceCreate(
-        project_id="123e4567-e89b-12d3-a456-426614174000",
         description="Default surface type"
     )
-    assert surface.surface_type == SurfaceType.WEB
+    assert surface.surface_type == "web"
 
-    # Missing required field
-    try:
-        AttackSurfaceCreate(
-            surface_type=SurfaceType.API,
-            description="Missing project_id"
-        )
-        assert False, "Should have raised ValidationError"
-    except Exception as e:
-        print(f"✓ Correctly raised error for missing project_id: {e}")
+    # Minimal valid data
+    surface = AttackSurfaceCreate()
+    assert surface.surface_type == "web"
+    assert surface.description is None
+    assert surface.config is None
+
+    # Test case conversion
+    surface = AttackSurfaceCreate(surface_type="WEB")
+    assert surface.surface_type == "web"
 
 
 def test_attack_surface_update():

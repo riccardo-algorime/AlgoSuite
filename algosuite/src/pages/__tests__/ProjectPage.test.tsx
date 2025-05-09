@@ -188,4 +188,25 @@ describe('ProjectPage', () => {
     // Verify empty state message is displayed
     expect(screen.getByText('No attack surfaces found for this project.')).toBeInTheDocument();
   });
+
+  it('navigates to create attack surface page when Create Attack Surface button is clicked', async () => {
+    // Setup - mock successful responses
+    (projectsApi.getProject as jest.Mock).mockResolvedValue(mockProject);
+    (projectsApi.getAttackSurfaces as jest.Mock).mockResolvedValue(mockAttackSurfaces);
+
+    // Render the component
+    renderWithProviders(<ProjectPage />);
+
+    // Wait for the project details to load
+    await waitFor(() => {
+      expect(screen.getByText('Test Project')).toBeInTheDocument();
+    });
+
+    // Find and click the Create Attack Surface button
+    const createButton = screen.getByText('Create Attack Surface');
+    fireEvent.click(createButton);
+
+    // Check if navigate was called with the correct path
+    expect(mockNavigate).toHaveBeenCalledWith('/projects/1/attack-surfaces/new');
+  });
 });

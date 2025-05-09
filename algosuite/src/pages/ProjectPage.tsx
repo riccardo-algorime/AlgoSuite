@@ -48,6 +48,11 @@ export const ProjectPage = () => {
     navigate(`/projects/${projectId}/attack-surfaces/${attackSurface.id}/edit`);
   };
 
+  // Handle navigation to create new attack surface
+  const handleCreateAttackSurface = () => {
+    navigate(`/projects/${projectId}/attack-surfaces/new`);
+  };
+
   // Handle back to dashboard navigation
   const handleBackToDashboard = () => {
     navigate('/dashboard');
@@ -130,9 +135,18 @@ export const ProjectPage = () => {
 
         {/* Attack Surfaces Section */}
         <Box width="100%">
-          <Heading as="h2" size="lg" mb={4}>
-            Attack Surfaces
-          </Heading>
+          <Flex justify="space-between" align="center" mb={4}>
+            <Heading as="h2" size="lg">
+              Attack Surfaces
+            </Heading>
+            <Button
+              colorScheme="blue"
+              onClick={handleCreateAttackSurface}
+              data-testid="create-attack-surface-button"
+            >
+              Create Attack Surface
+            </Button>
+          </Flex>
 
           {isLoadingAttackSurfaces ? (
             <Flex justify="center" py={8}>
