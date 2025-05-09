@@ -90,7 +90,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const formData = new URLSearchParams();
       formData.append('username', username);
       formData.append('password', password);
-      formData.append('client_id', 'algosuite-frontend');
+
+      // No need for client_id anymore with PostgreSQL auth
+      // formData.append('client_id', 'algosuite-frontend');
       formData.append('grant_type', 'password');
 
       // Call the backend API to authenticate
@@ -155,19 +157,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Logout function
   const logout = async () => {
     try {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-
-      if (refreshToken) {
-        // Call the backend API to invalidate the token
-        await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
-          },
-          body: JSON.stringify({ refresh_token: refreshToken }),
-        }).catch(err => console.error('Error during logout API call:', err));
-      }
+      // With JWT-based auth, we just need to call the logout endpoint
+      // No need to send the refresh token as we're not invalidating it server-side
+      await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        },
+      }).catch(err => console.error('Error during logout API call:', err));
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

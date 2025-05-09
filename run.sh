@@ -20,8 +20,7 @@ show_help() {
     echo -e "  ${GREEN}frontend${NC}        Start only the frontend service"
     echo -e "  ${GREEN}db${NC}              Start only the database service"
     echo -e "  ${GREEN}redis${NC}           Start only the Redis service"
-    echo -e "  ${GREEN}keycloak${NC}        Start only the Keycloak service"
-    echo -e "  ${GREEN}setup-auth${NC}     Set up Keycloak realm, clients, and test users"
+    echo -e "  ${GREEN}setup-auth${NC}     Set up database with test users"
     echo -e "  ${GREEN}celery${NC}          Start only the Celery worker"
     echo -e "  ${GREEN}dev${NC}             Start backend and frontend in development mode (without Docker)"
     echo -e "  ${GREEN}status${NC}          Check the status of all services"
@@ -60,11 +59,10 @@ list_components() {
     echo -e "  ${GREEN}Celery Worker${NC}"
     echo -e "    - Handles background tasks"
     echo
-    echo -e "  ${GREEN}Keycloak${NC}"
-    echo -e "    - Authentication and authorization server"
-    echo -e "    - Runs on port 8080"
-    echo -e "    - Admin console available at http://localhost:8080/admin"
-    echo -e "    - Default admin credentials: admin/admin"
+    echo -e "  ${GREEN}Authentication${NC}"
+    echo -e "    - Authentication is now handled directly by the backend"
+    echo -e "    - Uses PostgreSQL database for user management"
+    echo -e "    - Default admin user: admin@example.com / admin123"
 }
 
 # Function to check service status
@@ -107,12 +105,7 @@ check_status() {
         echo -e "${RED}Redis:${NC} Not running"
     fi
 
-    # Check if Keycloak is running (using curl instead of lsof)
-    if curl -s http://localhost:8080 > /dev/null; then
-        echo -e "${GREEN}Keycloak:${NC} Running on port 8080"
-    else
-        echo -e "${RED}Keycloak:${NC} Not running"
-    fi
+    # Authentication is now handled by the backend, no need to check Keycloak
 }
 
 # Function to start all services using docker-compose
@@ -125,26 +118,20 @@ start_all() {
     # Wait a moment for the database to be ready
     sleep 5
 
-    # Create the keycloak database if it doesn't exist
-    echo -e "${YELLOW}Ensuring keycloak database exists...${NC}"
-    docker exec algosuite_test_3-db-1 psql -U postgres -c "SELECT 1 FROM pg_database WHERE datname = 'keycloak'" | grep -q 1 || \
-    docker exec algosuite_test_3-db-1 psql -U postgres -c "CREATE DATABASE keycloak;"
-
     # Start the remaining services
     docker-compose up -d
 
-    # Set up Keycloak realm and clients
-    echo -e "${YELLOW}Setting up Keycloak realm and clients...${NC}"
-    setup_keycloak
+    # Set up authentication with test users
+    echo -e "${YELLOW}Setting up authentication with test users...${NC}"
+    setup_auth
 
     echo -e "${GREEN}All services started successfully!${NC}"
     echo -e "Frontend: http://localhost:5173"
     echo -e "Backend API: http://localhost:8000/api"
     echo -e "API Documentation: http://localhost:8000/api/docs"
-    echo -e "Keycloak Admin: http://localhost:8080/admin (admin/admin)"
     echo -e "Test Users:"
-    echo -e "  - Regular User: username='test', password='password'"
-    echo -e "  - Admin User: username='admin', password='admin'"
+    echo -e "  - Regular User: email='test@example.com', password='password123'"
+    echo -e "  - Admin User: email='admin@example.com', password='admin123'"
 }
 
 # Function to start only the backend service
@@ -180,9 +167,9 @@ start_redis() {
     echo -e "Redis running on port 6379"
 }
 
-# Function to start only the Keycloak service
-start_keycloak() {
-    echo -e "${BLUE}Starting Keycloak service...${NC}"
+# Function to set up authentication with test users
+setup_auth() {
+    echo -e "${BLUE}Setting up authentication with test users...${NC}"
 
     # Start the database first if it's not already running
     if ! docker ps | grep -q algosuite_test_3-db-1; then
@@ -191,49 +178,14 @@ start_keycloak() {
         sleep 5
     fi
 
-    # Create the keycloak database if it doesn't exist
-    echo -e "${YELLOW}Ensuring keycloak database exists...${NC}"
-    docker exec algosuite_test_3-db-1 psql -U postgres -c "SELECT 1 FROM pg_database WHERE datname = 'keycloak'" | grep -q 1 || \
-    docker exec algosuite_test_3-db-1 psql -U postgres -c "CREATE DATABASE keycloak;"
+    # Run the authentication setup script
+    echo -e "${YELLOW}Running authentication setup script...${NC}"
+    docker exec -it algosuite_test_3-backend-1 python scripts/setup_auth.py || echo -e "${YELLOW}Setup script not found or failed. Using default users.${NC}"
 
-    # Start Keycloak
-    docker-compose up -d keycloak
-
-    echo -e "${GREEN}Keycloak service started successfully!${NC}"
-    echo -e "Keycloak Admin: http://localhost:8080/admin (admin/admin)"
+    echo -e "${GREEN}Authentication setup completed!${NC}"
 }
 
-# Function to set up Keycloak realm and clients
-setup_keycloak() {
-    echo -e "${BLUE}Setting up Keycloak realm and clients...${NC}"
 
-    # Check if Keycloak is running
-    if ! curl -s http://localhost:8080 > /dev/null; then
-        echo -e "${YELLOW}Keycloak is not running. Starting Keycloak...${NC}"
-        start_keycloak
-
-        # Wait for Keycloak to be ready
-        echo -e "${YELLOW}Waiting for Keycloak to be ready...${NC}"
-        for i in {1..150}; do
-            if curl -s http://localhost:8080 > /dev/null; then
-                echo -e "${GREEN}Keycloak is ready!${NC}"
-                break
-            fi
-            echo -n "."
-            sleep 2
-            if [ $i -eq 150 ]; then
-                echo -e "${RED}Timed out waiting for Keycloak to start.${NC}"
-                exit 1
-            fi
-        done
-    fi
-
-    # Run the Keycloak setup script
-    echo -e "${YELLOW}Running Keycloak setup script...${NC}"
-    python scripts/setup_keycloak.py
-
-    echo -e "${GREEN}Keycloak setup completed!${NC}"
-}
 
 # Function to start only the Celery worker
 start_celery() {
@@ -294,11 +246,8 @@ case "$1" in
     redis)
         start_redis
         ;;
-    keycloak)
-        start_keycloak
-        ;;
     setup-auth)
-        setup_keycloak
+        setup_auth
         ;;
     celery)
         start_celery

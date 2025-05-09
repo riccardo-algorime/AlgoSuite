@@ -40,7 +40,7 @@ export function useProject(id: string) {
 export function useCreateProject() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: (newProject: { name: string; description?: string }) =>
       projectsApi.createProject(newProject),
     onSuccess: () => {
@@ -48,6 +48,16 @@ export function useCreateProject() {
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
     },
   });
+
+  return {
+    addProject: mutation.mutate,
+    isLoading: mutation.status === 'pending',
+    isError: mutation.status === 'error',
+    isSuccess: mutation.status === 'success',
+    reset: mutation.reset,
+    data: mutation.data,
+    error: mutation.error,
+  };
 }
 
 /**

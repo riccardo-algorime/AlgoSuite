@@ -34,10 +34,8 @@ services:
       - SECRET_KEY=development_secret_key
       - ENVIRONMENT=development
       - DEBUG=True
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=master
-      - KEYCLOAK_CLIENT_ID=algosuite-backend
-      - KEYCLOAK_CLIENT_SECRET=development_client_secret
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - ALGORITHM=HS256
       - OPENAI_API_KEY=sk-dummy-key-for-development-only
     depends_on:
       - db
@@ -60,10 +58,8 @@ services:
       - SECRET_KEY=development_secret_key
       - ENVIRONMENT=development
       - DEBUG=True
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=master
-      - KEYCLOAK_CLIENT_ID=algosuite-backend
-      - KEYCLOAK_CLIENT_SECRET=development_client_secret
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - ALGORITHM=HS256
       - OPENAI_API_KEY=sk-dummy-key-for-development-only
     depends_on:
       - backend
@@ -89,21 +85,7 @@ services:
     volumes:
       - redis_data:/data
 
-  # Keycloak service
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://db:5432/keycloak
-      - KC_DB_USERNAME=postgres
-      - KC_DB_PASSWORD=postgres
-    command: start-dev
-    depends_on:
-      - db
+
 
 volumes:
   postgres_data:

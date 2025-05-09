@@ -27,6 +27,8 @@ class Settings(BaseSettings):
         "http://localhost:5174",
         "http://127.0.0.1:5174",
         "http://127.0.0.1:46284",
+        "http://frontend:5173",  # Docker service name
+        "*",  # Allow all origins in development
     ]
 
     @field_validator("CORS_ORIGINS", mode="before")

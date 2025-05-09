@@ -55,16 +55,14 @@ export const ProjectPage = () => {
 
   // Show error toast if project fetch fails
   if (isErrorProject && projectError) {
-    toaster.error({
-      title: 'Error loading project',
+    toaster.error('Error loading project', {
       description: (projectError as Error).message || 'Failed to load project details',
     });
   }
 
   // Show error toast if attack surfaces fetch fails
   if (isErrorSurfaces && surfacesError) {
-    toaster.error({
-      title: 'Error loading attack surfaces',
+    toaster.error('Error loading attack surfaces', {
       description: (surfacesError as Error).message || 'Failed to load attack surfaces',
     });
   }
@@ -135,7 +133,7 @@ export const ProjectPage = () => {
           </Heading>
           {attackSurfaces && attackSurfaces.length > 0 ? (
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-              {attackSurfaces.map((surface) => (
+              {attackSurfaces.map((surface: AttackSurface) => (
                 <AttackSurfaceCard
                   key={surface.id}
                   attackSurface={surface}

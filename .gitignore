@@ -37,6 +37,9 @@ Thumbs.db
 .roomodes
 .roomodess
 .taskmasterconfig
+./aigi/*
+aigi/
+aigi/*
 
 # Project specific
 /docs/

@@ -1,11 +1,13 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr
+from sqlalchemy.orm import Session
 
+from app.api.dependencies.db import get_db
 from app.schemas.token import Token
-from app.schemas.user import UserCreate
-from app.services.keycloak import keycloak_service
+from app.schemas.user import UserCreate, User
+from app.services.user import user_service
 
 router = APIRouter()
 
@@ -16,29 +18,34 @@ class RegisterRequest(BaseModel):
     password: str
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
-async def register(request: RegisterRequest) -> Any:
+@router.post("", response_model=User, status_code=status.HTTP_201_CREATED)
+async def register(request: RegisterRequest, db: Session = Depends(get_db)) -> Any:
     """
-    Register a new user in Keycloak
+    Register a new user
     """
     try:
-        # Split full name into first and last name
-        name_parts = request.full_name.split(" ", 1)
-        first_name = name_parts[0]
-        last_name = name_parts[1] if len(name_parts) > 1 else ""
-        
-        # Create user in Keycloak
-        user_id = keycloak_service.create_user(
+        # Create user in database
+        user_create = UserCreate(
             email=request.email,
-            username=request.email,  # Use email as username
+            full_name=request.full_name,
             password=request.password,
-            first_name=first_name,
-            last_name=last_name,
-            enabled=True,
-            email_verified=True
+            is_active=True,
+            is_superuser=False
         )
-        
-        return {"detail": "User registered successfully", "user_id": user_id}
+
+        user = user_service.create(db, user_create)
+
+        # Return user data
+        return User(
+            id=user["id"],
+            email=user["email"],
+            full_name=user["full_name"],
+            is_active=user["is_active"],
+            is_superuser=user["is_superuser"]
+        )
+    except HTTPException as e:
+        # Re-raise HTTP exceptions
+        raise e
     except Exception as e:
         if "already exists" in str(e).lower():
             raise HTTPException(

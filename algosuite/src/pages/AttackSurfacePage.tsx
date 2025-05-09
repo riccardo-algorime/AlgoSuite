@@ -70,8 +70,7 @@ export const AttackSurfacePage = () => {
     const errorMessage = error instanceof Error ? error.message : 'Failed to load attack surface details';
 
     // Show error toast
-    toaster.error({
-      title: 'Error',
+    toaster.error('Error', {
       description: errorMessage,
     });
 

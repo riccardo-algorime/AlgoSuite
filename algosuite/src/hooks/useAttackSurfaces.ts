@@ -26,6 +26,11 @@ export function useAttackSurfaces(projectId: string, params?: PaginationParams) 
 }
 
 /**
+ * Alias for useAttackSurfaces for backward compatibility
+ */
+export const useProjectAttackSurfaces = useAttackSurfaces;
+
+/**
  * Custom hook to fetch a single attack surface by ID
  */
 export function useAttackSurface(projectId: string, surfaceId: string) {
