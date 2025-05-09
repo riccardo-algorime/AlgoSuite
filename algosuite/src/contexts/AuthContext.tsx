@@ -32,7 +32,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Initialize auth state from local storage if available
   const [authState, setAuthState] = useState<AuthState>(() => {
     const token = localStorage.getItem(TOKEN_KEY);
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
     const user = localStorage.getItem(USER_KEY);
+
+    // Log token status for debugging
+    console.log('Auth initialization:', {
+      hasToken: !!token,
+      hasRefreshToken: !!refreshToken,
+      hasUser: !!user
+    });
+
+    // Ensure we have both tokens
+    if (token && !refreshToken) {
+      console.warn('Access token exists but no refresh token found - this may cause issues with token refresh');
+    }
 
     return {
       isAuthenticated: !!token,
@@ -56,6 +69,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     if (!authState.isAuthenticated) return;
 
+    console.log('Setting up token refresh interval...');
+
+    // Don't try to refresh immediately on login - the token is already fresh
+    // Only set up the interval for automatic refresh
+
     // Refresh token every 25 minutes (tokens typically expire after 30 minutes)
     const refreshInterval = setInterval(async () => {
       try {
@@ -71,9 +89,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Listen for auth:failed events
   useEffect(() => {
-    const handleAuthFailed = () => {
-      console.log('Authentication failed event received, logging out...');
-      logout();
+    const handleAuthFailed = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const errorDetail = customEvent.detail?.error || 'Unknown error';
+      console.log(`Authentication failed event received: ${errorDetail}`);
+
+      // Be very selective about when to log out
+      // Only log out for critical authentication errors, not for refresh token issues
+      // This prevents logout on page refresh
+      if (errorDetail.includes('Incorrect email or password') ||
+          errorDetail.includes('Invalid credentials')) {
+        console.log('Critical auth error - logging out');
+        logout();
+      } else {
+        console.log('Non-critical auth error - not logging out');
+      }
     };
 
     window.addEventListener('auth:failed', handleAuthFailed);
@@ -112,9 +142,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Parse the response
       const data = await response.json();
 
+      console.log('Login successful, received tokens');
+
+      // Validate that we received the expected tokens
+      if (!data.access_token) {
+        throw new Error('No access token received from server');
+      }
+
       // Store tokens in local storage
       localStorage.setItem(TOKEN_KEY, data.access_token);
       localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token || '');
+
+      // Log token storage for debugging
+      console.log('Tokens stored in localStorage:', {
+        hasAccessToken: !!data.access_token,
+        hasRefreshToken: !!data.refresh_token
+      });
 
       // Get user info using the token
       const userResponse = await fetchUserInfo(data.access_token);
@@ -216,31 +259,61 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
       if (!refreshToken) {
+        console.warn('No refresh token available in localStorage');
         throw new Error('No refresh token available');
       }
 
-      console.log('Refreshing token...');
+      console.log('Refreshing token from AuthContext...');
 
       // Call the backend API to refresh the token
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
+      // Note: The backend expects refresh_token as a query parameter, not in the body
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // No body needed as we're passing the token as a query parameter
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || 'Token refresh failed');
+        const errorText = await response.text();
+        console.error(`Token refresh failed with status ${response.status}: ${errorText}`);
+
+        // Try to parse as JSON if possible
+        let errorDetail = '';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorDetail = errorData.detail || '';
+        } catch (e) {
+          // Not valid JSON, use empty string for detail
+        }
+
+        throw new Error(errorDetail || `Token refresh failed with status ${response.status}`);
       }
 
       // Parse the response
       const data = await response.json();
 
+      // Validate the response data
+      if (!data.access_token) {
+        console.error('Token refresh response missing access_token');
+        throw new Error('Invalid token refresh response');
+      }
+
+      console.log('Token refreshed successfully in AuthContext');
+
       // Update tokens in local storage
       localStorage.setItem(TOKEN_KEY, data.access_token);
       localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token || '');
+
+      // Log token storage for debugging
+      console.log('Refreshed tokens stored in localStorage:', {
+        hasAccessToken: !!data.access_token,
+        hasRefreshToken: !!data.refresh_token
+      });
 
       // Update auth state
       setAuthState((prev: AuthState) => ({
@@ -252,8 +325,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch (error) {
       console.error('Token refresh error:', error);
 
-      // If refresh fails, log out the user
-      await logout();
+      // IMPORTANT: Never log out on token refresh errors
+      // This prevents the user from being logged out on page refresh
+      // The auth:failed event will handle critical auth errors
+
       throw error;
     }
   };

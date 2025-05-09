@@ -95,13 +95,13 @@ async def refresh_token(refresh_token: str, db: Session = Depends(get_db)) -> An
         # Create new access token
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = security_service.create_access_token(
-            subject=user.id, expires_delta=access_token_expires
+            subject=user["id"], expires_delta=access_token_expires
         )
 
         # Create new refresh token
         refresh_token_expires = timedelta(days=30)  # 30 days
         new_refresh_token = security_service.create_access_token(
-            subject=user.id, expires_delta=refresh_token_expires
+            subject=user["id"], expires_delta=refresh_token_expires
         )
 
         return {
