@@ -1,92 +1,152 @@
 import { ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
+import { useLocation } from 'react-router-dom'
 import {
   Box,
   Button,
   Container,
   Flex,
   Heading,
-  Text
+  Text,
 } from '@chakra-ui/react'
-import { ThemeToggle } from './ThemeToggle'
 import { HStack } from './ui/stack'
 import { NavLink } from './ui/link'
+import {
+  DashboardIcon,
+  AssetsIcon,
+  ScansIcon,
+  TemplatesIcon,
+  DocsIcon,
+  SettingsIcon
+} from './icons/NavIcons'
 
 interface LayoutProps {
   children: ReactNode
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-  const { authState, logout } = useAuth()
-  const navigate = useNavigate()
+  const location = useLocation()
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/login')
+  // Check if a path is active
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`)
   }
+
+  // Define navigation item type
+  type NavItem = {
+    path: string;
+    label: string;
+    icon: React.ComponentType<any>;
+    exists: boolean;
+  };
+
+  // Define the main navigation items
+  const mainNavItems: NavItem[] = [
+    { path: '/dashboard', label: 'Dashboard', icon: DashboardIcon, exists: true },
+    { path: '/assets', label: 'Assets', icon: AssetsIcon, exists: false },
+    { path: '/scans', label: 'Scans', icon: ScansIcon, exists: false },
+    { path: '/templates', label: 'Templates', icon: TemplatesIcon, exists: false },
+  ]
 
   return (
     <Flex direction="column" minH="100vh">
-      <Box as="header" bg="background.card" py={4}>
+      {/* Main Navigation Bar */}
+      <Box as="header" bg="#050505" py={2} borderBottom="1px solid #333">
         <Container maxW="container.xl">
           <Flex justify="space-between" align="center">
-            <Heading as="h1" size="lg" m={0}>
-              <NavLink to="/" _hover={{ textDecoration: 'none' }}>
-                AlgoSuite
-              </NavLink>
-            </Heading>
-            <HStack spacing={6} align="center">
-              <NavLink to="/">
-                Home
-              </NavLink>
-              {authState.isAuthenticated && (
-                <NavLink to="/dashboard">
-                  Dashboard
+            {/* Logo and Main Nav */}
+            <HStack spacing={8} align="center">
+              {/* Logo */}
+              <HStack spacing={2}>
+                <NavLink to="/" _hover={{ textDecoration: 'none' }}>
+                  <Heading as="h1" size="md" color="white" m={0}>
+                    ricardobevoni
+                  </Heading>
                 </NavLink>
-              )}
-              <NavLink to="/about">
-                About
-              </NavLink>
-              <NavLink to="/components">
-                Components
-              </NavLink>
-              {authState.isAuthenticated ? (
-                <>
-                  <Text fontSize="sm" color="text.secondary">
-                    {authState.user?.email || 'User'}
-                  </Text>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleLogout}
+                <Button
+                  size="xs"
+                  variant="outline"
+                  color="white"
+                  borderColor="gray.600"
+                  _hover={{ bg: 'gray.800' }}
+                >
+                  FREE
+                </Button>
+              </HStack>
+
+              {/* Main Navigation */}
+              <HStack spacing={4} align="center">
+                {mainNavItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.exists ? item.path : '#'}
+                    color="white"
+                    opacity={isActive(item.path) ? 1 : 0.7}
+                    _hover={{ opacity: 1 }}
+                    display="flex"
+                    alignItems="center"
+                    onClick={!item.exists ? (e) => e.preventDefault() : undefined}
                   >
-                    Logout
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <NavLink to="/login">
-                    Login
+                    <Box mr={2}>
+                      <item.icon boxSize={5} />
+                    </Box>
+                    {item.label}
                   </NavLink>
-                  <NavLink to="/register">
-                    Register
-                  </NavLink>
-                </>
-              )}
-              <ThemeToggle />
+                ))}
+              </HStack>
+            </HStack>
+
+            {/* Right Side Controls */}
+            <HStack spacing={4} align="center">
+              <Button
+                variant="outline"
+                size="sm"
+                color="white"
+                borderColor="gray.600"
+                _hover={{ bg: 'gray.800' }}
+              >
+                Feedback
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                color="white"
+                _hover={{ bg: 'gray.800' }}
+              >
+                Changelog
+              </Button>
+              <NavLink
+                to="/docs"
+                color="white"
+                opacity={0.7}
+                _hover={{ opacity: 1 }}
+              >
+                <DocsIcon boxSize={5} />
+              </NavLink>
+              <Button
+                variant="ghost"
+                size="sm"
+                color="white"
+                _hover={{ bg: 'gray.800' }}
+                p={1}
+              >
+                <SettingsIcon boxSize={5} />
+              </Button>
             </HStack>
           </Flex>
         </Container>
       </Box>
-      <Box as="main" flex="1" py={8}>
+
+      {/* Main Content */}
+      <Box as="main" flex="1" py={8} bg="#050505" color="white">
         <Container maxW="container.xl">
           {children}
         </Container>
       </Box>
-      <Box as="footer" bg="background.card" py={4} textAlign="center">
+
+      {/* Footer */}
+      <Box as="footer" bg="#050505" py={4} textAlign="center" borderTop="1px solid #333">
         <Container maxW="container.xl">
-          <Text fontSize="sm" color="text.secondary">
+          <Text fontSize="sm" color="gray.500">
             © {new Date().getFullYear()} AlgoSuite. All rights reserved.
           </Text>
         </Container>
