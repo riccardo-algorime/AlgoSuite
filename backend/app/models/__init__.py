@@ -6,3 +6,4 @@ from app.models.finding import Finding  # noqa
 from app.models.scan_result import ScanResult  # noqa
 from app.models.project import Project  # noqa
 from app.models.attack_surface import AttackSurface  # noqa
+from app.models.asset import Asset  # noqa

@@ -4,4 +4,8 @@ from app.schemas.token import Token, TokenPayload
 from app.schemas.health import HealthCheck
 from app.schemas.scan import Scan, ScanCreate, ScanUpdate, Finding, ScanResult
 from app.schemas.project import Project, ProjectCreate, ProjectUpdate, ProjectWithRelationships
-from app.schemas.attack_surface import AttackSurface, AttackSurfaceCreate, AttackSurfaceUpdate
+from app.schemas.attack_surface import AttackSurface, AttackSurfaceCreate, AttackSurfaceUpdate, AttackSurfaceWithAssets
+from app.schemas.asset import Asset, AssetCreate, AssetUpdate
+
+# Resolve circular references - using the newer Pydantic v2 approach
+AttackSurfaceWithAssets.model_rebuild()

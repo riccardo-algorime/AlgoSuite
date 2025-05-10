@@ -1,9 +1,12 @@
 from datetime import datetime
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, List, TYPE_CHECKING, ForwardRef
 
-from pydantic import BaseModel, Field, ConfigDict, validator
+from pydantic import BaseModel, Field, ConfigDict, validator, model_validator
 
 from app.models.attack_surface import SurfaceType
+
+if TYPE_CHECKING:
+    from app.schemas.asset import Asset
 
 
 # Shared properties
@@ -52,3 +55,8 @@ class AttackSurfaceInDBBase(AttackSurfaceBase):
 # Additional properties to return via API
 class AttackSurface(AttackSurfaceInDBBase):
     pass
+
+
+# Attack Surface with relationships
+class AttackSurfaceWithAssets(AttackSurface):
+    assets: List["Asset"] = []

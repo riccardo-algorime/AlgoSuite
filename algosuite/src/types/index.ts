@@ -1,4 +1,5 @@
 // Common type definitions for the application
+export * from './models';
 
 /**
  * User profile information

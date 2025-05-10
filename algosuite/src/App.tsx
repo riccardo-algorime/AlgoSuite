@@ -9,8 +9,10 @@ import { ComponentsDemo } from './pages/ComponentsDemo'
 import { DashboardPage } from './pages/DashboardPage'
 import { ProjectPage } from './pages/ProjectPage'
 import { AttackSurfacePage } from './pages/AttackSurfacePage'
+import { AssetPage } from './pages/AssetPage'
 import { CreateProjectPage } from './pages/CreateProjectPage'
 import { CreateAttackSurfacePage } from './pages/CreateAttackSurfacePage'
+import { CreateAssetPage } from './pages/CreateAssetPage'
 import { EditProjectPage } from './pages/EditProjectPage'
 import { EditAttackSurfacePage } from './pages/EditAttackSurfacePage'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -72,6 +74,22 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <AttackSurfacePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/projects/:projectId/attack-surfaces/:surfaceId/assets/new"
+                  element={
+                    <ProtectedRoute>
+                      <CreateAssetPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/projects/:projectId/attack-surfaces/:surfaceId/assets/:assetId"
+                  element={
+                    <ProtectedRoute>
+                      <AssetPage />
                     </ProtectedRoute>
                   }
                 />

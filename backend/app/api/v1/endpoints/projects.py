@@ -11,9 +11,10 @@ from app.api.dependencies.auth import get_current_active_user
 from app.api.dependencies.db import get_db
 from app.models.project import Project
 from app.models.attack_surface import AttackSurface, SurfaceType
+from app.models.asset import Asset
 from app.models.user import User as UserModel
 from app.schemas.project import Project as ProjectSchema
-from app.schemas.attack_surface import AttackSurface as AttackSurfaceSchema, AttackSurfaceCreate
+from app.schemas.attack_surface import AttackSurface as AttackSurfaceSchema, AttackSurfaceCreate, AttackSurfaceWithAssets
 from app.schemas.user import User
 from app.services.user import user_service
 from app.services.security import security_service
@@ -111,7 +112,7 @@ async def get_project_attack_surfaces(
     return attack_surfaces
 
 
-@router.get("/{project_id}/attack-surfaces/{surface_id}", response_model=AttackSurfaceSchema)
+@router.get("/{project_id}/attack-surfaces/{surface_id}", response_model=AttackSurfaceWithAssets)
 async def get_project_attack_surface(
     project_id: str,
     surface_id: str,
@@ -155,7 +156,30 @@ async def get_project_attack_surface(
             detail="Attack surface not found"
         )
 
-    return attack_surface
+    # Query the database for assets associated with the attack surface
+    assets = (
+        db.query(Asset)
+        .filter(Asset.attack_surface_id == surface_id)
+        .all()
+    )
+
+    # Create a response with the attack surface and its assets
+    # Convert the SQLAlchemy model to a dictionary first
+    attack_surface_dict = {
+        "id": attack_surface.id,
+        "project_id": attack_surface.project_id,
+        "surface_type": attack_surface.surface_type,
+        "description": attack_surface.description,
+        "config": attack_surface.config,
+        "created_at": attack_surface.created_at,
+        "updated_at": attack_surface.updated_at,
+        "assets": assets
+    }
+
+    # Use model_validate with the dictionary
+    response = AttackSurfaceWithAssets.model_validate(attack_surface_dict)
+
+    return response
 
 
 @router.post("/{project_id}/attack-surfaces/", response_model=AttackSurfaceSchema, status_code=status.HTTP_201_CREATED)

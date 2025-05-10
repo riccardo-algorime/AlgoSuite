@@ -1,5 +1,13 @@
 import { api } from './apiClient';
-import { Project, AttackSurface, PaginationParams, SurfaceType } from '../types';
+import {
+  Project,
+  AttackSurface,
+  AttackSurfaceWithAssets,
+  Asset,
+  AssetType,
+  PaginationParams,
+  SurfaceType
+} from '../types';
 
 // Convert PaginationParams to Record<string, string | number | boolean>
 const convertParams = (params?: PaginationParams): Record<string, string | number | boolean> | undefined => {
@@ -35,6 +43,22 @@ interface AttackSurfaceUpdatePayload {
   surface_type?: SurfaceType;
   description?: string;
   config?: Record<string, unknown>;
+}
+
+// Asset creation payload type
+interface AssetCreatePayload {
+  name: string;
+  asset_type: AssetType;
+  description?: string;
+  asset_metadata?: Record<string, unknown>;
+}
+
+// Asset update payload type
+interface AssetUpdatePayload {
+  name?: string;
+  asset_type?: AssetType;
+  description?: string;
+  asset_metadata?: Record<string, unknown>;
 }
 
 /**
@@ -140,5 +164,76 @@ export const projectsApi = {
    */
   deleteAttackSurface: (projectId: string, surfaceId: string): Promise<void> => {
     return api.delete<void>(`/v1/projects/${projectId}/attack-surfaces/${surfaceId}`);
+  },
+
+  /**
+   * Get attack surface with assets
+   * @param projectId The ID of the project
+   * @param surfaceId The ID of the attack surface
+   * @returns Promise with attack surface data including assets
+   */
+  getAttackSurfaceWithAssets: (projectId: string, surfaceId: string): Promise<AttackSurfaceWithAssets> => {
+    return api.get<AttackSurfaceWithAssets>(`/v1/projects/${projectId}/attack-surfaces/${surfaceId}`);
+  },
+
+  /**
+   * Get all assets for a specific attack surface
+   * @param projectId The ID of the project
+   * @param surfaceId The ID of the attack surface
+   * @param params Optional pagination parameters
+   * @returns Promise with array of assets
+   */
+  getAssets: (projectId: string, surfaceId: string, params?: PaginationParams): Promise<Asset[]> => {
+    return api.get<Asset[]>(`/v1/projects/${projectId}/attack-surfaces/${surfaceId}/assets`, { params: convertParams(params) });
+  },
+
+  /**
+   * Get a specific asset by ID
+   * @param projectId The ID of the project
+   * @param surfaceId The ID of the attack surface
+   * @param assetId The ID of the asset
+   * @returns Promise with asset data
+   */
+  getAsset: (projectId: string, surfaceId: string, assetId: string): Promise<Asset> => {
+    return api.get<Asset>(`/v1/projects/${projectId}/attack-surfaces/${surfaceId}/assets/${assetId}`);
+  },
+
+  /**
+   * Create a new asset for an attack surface
+   * @param projectId The ID of the project
+   * @param surfaceId The ID of the attack surface
+   * @param asset The asset data to create
+   * @returns Promise with the created asset
+   */
+  createAsset: (projectId: string, surfaceId: string, asset: AssetCreatePayload): Promise<Asset> => {
+    return api.post<Asset>(`/v1/projects/${projectId}/attack-surfaces/${surfaceId}/assets`, asset);
+  },
+
+  /**
+   * Update an existing asset
+   * @param projectId The ID of the project
+   * @param surfaceId The ID of the attack surface
+   * @param assetId The ID of the asset to update
+   * @param asset The asset data to update
+   * @returns Promise with the updated asset
+   */
+  updateAsset: (
+    projectId: string,
+    surfaceId: string,
+    assetId: string,
+    asset: AssetUpdatePayload
+  ): Promise<Asset> => {
+    return api.put<Asset>(`/v1/projects/${projectId}/attack-surfaces/${surfaceId}/assets/${assetId}`, asset);
+  },
+
+  /**
+   * Delete an asset
+   * @param projectId The ID of the project
+   * @param surfaceId The ID of the attack surface
+   * @param assetId The ID of the asset to delete
+   * @returns Promise with void
+   */
+  deleteAsset: (projectId: string, surfaceId: string, assetId: string): Promise<void> => {
+    return api.delete<void>(`/v1/projects/${projectId}/attack-surfaces/${surfaceId}/assets/${assetId}`);
   }
 };

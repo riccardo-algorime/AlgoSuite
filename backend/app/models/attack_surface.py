@@ -35,3 +35,4 @@ class AttackSurface(BaseModel):
 
     # Relationships
     project = relationship("Project", back_populates="attack_surfaces")
+    assets = relationship("Asset", back_populates="attack_surface", cascade="all, delete-orphan")

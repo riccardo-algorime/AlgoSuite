@@ -10,16 +10,13 @@ import {
   Badge,
   Code,
   CodeProps,
-  SimpleGrid,
 } from '@chakra-ui/react';
 import { Divider } from '../components/ui/divider';
 import { toaster } from '../components/ui/toaster';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAttackSurfaceWithAssets } from '../hooks/useAttackSurfaces';
+import { useAsset } from '../hooks/useAssets';
 import { formatDate } from '../utils/formatters';
-import { getSurfaceTypeColorScheme, formatSurfaceType, getSurfaceTypeIcon } from '../utils/surfaceHelpers';
-import { AssetCard } from '../components/AssetCard';
-import { Asset } from '../types';
+import { AssetType } from '../types';
 
 // JSON display component with syntax highlighting
 const JsonDisplay = (props: CodeProps & { data: Record<string, unknown> }) => {
@@ -39,34 +36,56 @@ const JsonDisplay = (props: CodeProps & { data: Record<string, unknown> }) => {
   );
 };
 
-export const AttackSurfacePage = () => {
-  // Get project ID and surface ID from URL parameters
-  const { projectId, surfaceId } = useParams<{ projectId: string; surfaceId: string }>();
+// Color scheme for different asset types
+const getAssetTypeColorScheme = (type: AssetType): string => {
+  switch (type) {
+    case AssetType.SERVER:
+      return 'blue';
+    case AssetType.WEBSITE:
+      return 'green';
+    case AssetType.DATABASE:
+      return 'purple';
+    case AssetType.APPLICATION:
+      return 'orange';
+    case AssetType.ENDPOINT:
+      return 'cyan';
+    case AssetType.CONTAINER:
+      return 'pink';
+    case AssetType.NETWORK_DEVICE:
+      return 'teal';
+    case AssetType.CLOUD_RESOURCE:
+      return 'yellow';
+    case AssetType.OTHER:
+    default:
+      return 'gray';
+  }
+};
+
+// Format asset type for display
+const formatAssetType = (type: AssetType): string => {
+  // Convert snake_case to Title Case
+  return type
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
+export const AssetPage = () => {
+  // Get project ID, surface ID, and asset ID from URL parameters
+  const { projectId, surfaceId, assetId } = useParams<{ projectId: string; surfaceId: string; assetId: string }>();
   const navigate = useNavigate();
 
-  // Fetch attack surface details with assets
+  // Fetch asset details
   const {
-    data: attackSurface,
+    data: asset,
     isLoading,
     isError,
     error,
-  } = useAttackSurfaceWithAssets(projectId || '', surfaceId || '');
+  } = useAsset(projectId || '', surfaceId || '', assetId || '');
 
-  // We don't need the create asset mutation here as we're just navigating to the create page
-
-  // Handle navigation back to project page
-  const handleBackToProject = () => {
-    navigate(`/projects/${projectId}`);
-  };
-
-  // Handle viewing an asset
-  const handleViewAsset = (asset: Asset) => {
-    navigate(`/projects/${projectId}/attack-surfaces/${surfaceId}/assets/${asset.id}`);
-  };
-
-  // Handle editing an asset
-  const handleEditAsset = (asset: Asset) => {
-    navigate(`/projects/${projectId}/attack-surfaces/${surfaceId}/assets/${asset.id}/edit`);
+  // Handle navigation back to attack surface page
+  const handleBackToAttackSurface = () => {
+    navigate(`/projects/${projectId}/attack-surfaces/${surfaceId}`);
   };
 
   // Show loading state
@@ -81,8 +100,8 @@ export const AttackSurfacePage = () => {
   }
 
   // Show error state
-  if (isError || !attackSurface) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to load attack surface details';
+  if (isError || !asset) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to load asset details';
 
     // Show error toast
     toaster.error('Error', {
@@ -92,12 +111,12 @@ export const AttackSurfacePage = () => {
     return (
       <Container maxW="container.lg" py={8}>
         <VStack gap={4} align="stretch">
-          <Button variant="outline" onClick={handleBackToProject}>
-            ← Back to Project
+          <Button variant="outline" onClick={handleBackToAttackSurface}>
+            ← Back to Attack Surface
           </Button>
           <Box textAlign="center" py={10}>
             <Heading as="h2" size="lg" color="red.500" mb={4}>
-              Error Loading Attack Surface
+              Error Loading Asset
             </Heading>
             <Text>{errorMessage}</Text>
           </Box>
@@ -106,15 +125,14 @@ export const AttackSurfacePage = () => {
     );
   }
 
-  // Extract attack surface details
-  const { surface_type, description, created_at, updated_at, config, assets } = attackSurface;
+  // Extract asset details
+  const { name, asset_type, description, created_at, updated_at, asset_metadata } = asset;
 
   // Format data for display
-  const colorScheme = getSurfaceTypeColorScheme(surface_type);
-  const formattedType = formatSurfaceType(surface_type);
+  const colorScheme = getAssetTypeColorScheme(asset_type);
+  const formattedType = formatAssetType(asset_type);
   const formattedCreatedAt = formatDate(created_at);
   const formattedUpdatedAt = formatDate(updated_at);
-  const surfaceIcon = getSurfaceTypeIcon(surface_type);
 
   return (
     <Container maxW="container.lg" py={8}>
@@ -122,19 +140,16 @@ export const AttackSurfacePage = () => {
         {/* Back button */}
         <Button
           variant="outline"
-          onClick={handleBackToProject}
+          onClick={handleBackToAttackSurface}
           alignSelf="flex-start"
         >
-          ← Back to Project
+          ← Back to Attack Surface
         </Button>
 
         {/* Header */}
         <Flex justify="space-between" align="center">
           <Heading as="h1" size="xl">
-            <Box as="span" mr={2}>
-              {surfaceIcon}
-            </Box>
-            {formattedType} Attack Surface
+            {name}
           </Heading>
           <Badge colorScheme={colorScheme} fontSize="md" px={3} py={1}>
             {formattedType}
@@ -161,7 +176,19 @@ export const AttackSurfacePage = () => {
           <VStack gap={2} align="stretch">
             <Flex>
               <Text fontWeight="bold" width="150px">
-                Surface ID:
+                Asset ID:
+              </Text>
+              <Text>{assetId}</Text>
+            </Flex>
+            <Flex>
+              <Text fontWeight="bold" width="150px">
+                Asset Type:
+              </Text>
+              <Text>{formattedType}</Text>
+            </Flex>
+            <Flex>
+              <Text fontWeight="bold" width="150px">
+                Attack Surface ID:
               </Text>
               <Text>{surfaceId}</Text>
             </Flex>
@@ -186,50 +213,15 @@ export const AttackSurfacePage = () => {
           </VStack>
         </Box>
 
-        {/* Configuration */}
-        {config && (
+        {/* Asset Metadata */}
+        {asset_metadata && (
           <Box>
             <Heading as="h2" size="md" mb={4}>
-              Configuration
+              Asset Metadata
             </Heading>
-            <JsonDisplay data={config} bg="gray.50" _dark={{ bg: 'gray.800' }} />
+            <JsonDisplay data={asset_metadata} bg="gray.50" _dark={{ bg: 'gray.800' }} />
           </Box>
         )}
-
-        <Divider />
-
-        {/* Assets */}
-        <Box>
-          <Flex justify="space-between" align="center" mb={4}>
-            <Heading as="h2" size="md">
-              Assets
-            </Heading>
-            <Button
-              size="sm"
-              colorScheme="blue"
-              onClick={() => navigate(`/projects/${projectId}/attack-surfaces/${surfaceId}/assets/new`)}
-            >
-              Add Asset
-            </Button>
-          </Flex>
-
-          {assets && assets.length > 0 ? (
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-              {assets.map((asset) => (
-                <AssetCard
-                  key={asset.id}
-                  asset={asset}
-                  onView={handleViewAsset}
-                  onEdit={handleEditAsset}
-                />
-              ))}
-            </SimpleGrid>
-          ) : (
-            <Box p={6} borderWidth="1px" borderRadius="lg" bg="background.card">
-              <Text textAlign="center">No assets found for this attack surface.</Text>
-            </Box>
-          )}
-        </Box>
       </VStack>
     </Container>
   );

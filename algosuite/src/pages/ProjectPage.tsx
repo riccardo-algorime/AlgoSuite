@@ -4,18 +4,44 @@ import {
   Container,
   Flex,
   Heading,
-  SimpleGrid,
   Spinner,
   Text,
   VStack,
+  Badge,
 } from '@chakra-ui/react';
+import { Table } from '@chakra-ui/react';
 import { toaster } from '../components/ui/toaster';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProject } from '../hooks/useProjects';
 import { useProjectAttackSurfaces } from '../hooks/useAttackSurfaces';
-import { AttackSurfaceCard } from '../components/AttackSurfaceCard';
-import { AttackSurface } from '../types';
+import { AttackSurface, SurfaceType } from '../types';
 import { formatDate } from '../utils/formatters';
+
+// Color scheme for different surface types
+const getSurfaceTypeColorScheme = (type: SurfaceType): string => {
+  switch (type) {
+    case SurfaceType.WEB:
+      return 'blue';
+    case SurfaceType.API:
+      return 'green';
+    case SurfaceType.MOBILE:
+      return 'purple';
+    case SurfaceType.NETWORK:
+      return 'orange';
+    case SurfaceType.CLOUD:
+      return 'cyan';
+    case SurfaceType.IOT:
+      return 'pink';
+    case SurfaceType.OTHER:
+    default:
+      return 'gray';
+  }
+};
+
+// Format surface type for display
+const formatSurfaceType = (type: SurfaceType): string => {
+  return type.charAt(0).toUpperCase() + type.slice(1);
+};
 
 export const ProjectPage = () => {
   // Get project ID from URL parameters
@@ -153,16 +179,47 @@ export const ProjectPage = () => {
               <Spinner size="md" color="blue.500" />
             </Flex>
           ) : attackSurfaces && attackSurfaces.length > 0 ? (
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-              {attackSurfaces.map((surface: AttackSurface) => (
-                <AttackSurfaceCard
-                  key={surface.id}
-                  attackSurface={surface}
-                  onView={handleViewAttackSurface}
-                  onEdit={handleEditAttackSurface}
-                />
-              ))}
-            </SimpleGrid>
+            <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
+              <Table.Root variant="outline" size="md" interactive>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.ColumnHeader>Type</Table.ColumnHeader>
+                    <Table.ColumnHeader>Description</Table.ColumnHeader>
+                    <Table.ColumnHeader>Created</Table.ColumnHeader>
+                    <Table.ColumnHeader>Updated</Table.ColumnHeader>
+                    <Table.ColumnHeader textAlign="right">Actions</Table.ColumnHeader>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {attackSurfaces.map((surface: AttackSurface) => {
+                    // Get color scheme and formatted type
+                    const colorScheme = getSurfaceTypeColorScheme(surface.surface_type);
+                    const formattedType = formatSurfaceType(surface.surface_type);
+
+                    return (
+                      <Table.Row key={surface.id}>
+                        <Table.Cell>
+                          <Badge colorScheme={colorScheme} fontSize="0.8em">
+                            {formattedType}
+                          </Badge>
+                        </Table.Cell>
+                        <Table.Cell>{surface.description || '-'}</Table.Cell>
+                        <Table.Cell>{formatDate(surface.created_at)}</Table.Cell>
+                        <Table.Cell>{formatDate(surface.updated_at)}</Table.Cell>
+                        <Table.Cell textAlign="right">
+                          <Button size="sm" variant="ghost" onClick={() => handleViewAttackSurface(surface)} mr={2}>
+                            View
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => handleEditAttackSurface(surface)}>
+                            Edit
+                          </Button>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })}
+                </Table.Body>
+              </Table.Root>
+            </Box>
           ) : (
             <Box p={6} borderWidth="1px" borderRadius="lg" bg="background.card">
               <Text textAlign="center">No attack surfaces found for this project.</Text>

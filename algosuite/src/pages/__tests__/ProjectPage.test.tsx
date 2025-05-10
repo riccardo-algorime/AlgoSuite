@@ -99,11 +99,18 @@ describe('ProjectPage', () => {
     expect(screen.getAllByText(/Created:/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Last updated:/).length).toBeGreaterThan(0);
 
-    // Verify attack surfaces are rendered
-    expect(screen.getByText('Web Surface')).toBeInTheDocument();
+    // Verify attack surfaces are rendered in the table
+    expect(screen.getByText('Web')).toBeInTheDocument();
     expect(screen.getByText('Web application frontend')).toBeInTheDocument();
-    expect(screen.getByText('Api Surface')).toBeInTheDocument();
+    expect(screen.getByText('Api')).toBeInTheDocument();
     expect(screen.getByText('REST API endpoints')).toBeInTheDocument();
+
+    // Verify table headers
+    expect(screen.getByText('Type')).toBeInTheDocument();
+    expect(screen.getByText('Description')).toBeInTheDocument();
+    expect(screen.getByText('Created')).toBeInTheDocument();
+    expect(screen.getByText('Updated')).toBeInTheDocument();
+    expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
   it('renders error state when project fetch fails', async () => {
@@ -124,9 +131,8 @@ describe('ProjectPage', () => {
 
     // Verify toast was called with error message
     expect(mockToaster.error).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: 'Error loading project',
-      })
+      'Error loading project',
+      expect.anything()
     );
   });
 

@@ -58,6 +58,51 @@ export interface AttackSurfaceUpdate {
   config?: Record<string, any>;
 }
 
+// Asset model
+export enum AssetType {
+  SERVER = "server",
+  WEBSITE = "website",
+  DATABASE = "database",
+  APPLICATION = "application",
+  ENDPOINT = "endpoint",
+  CONTAINER = "container",
+  NETWORK_DEVICE = "network_device",
+  CLOUD_RESOURCE = "cloud_resource",
+  OTHER = "other",
+}
+
+export interface Asset {
+  id: string;
+  name: string;
+  asset_type: AssetType;
+  description: string | null;
+  asset_metadata: Record<string, any> | null;
+  attack_surface_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Asset creation payload
+export interface AssetCreate {
+  name: string;
+  asset_type: AssetType;
+  description?: string;
+  asset_metadata?: Record<string, any>;
+}
+
+// Asset update payload
+export interface AssetUpdate {
+  name?: string;
+  asset_type?: AssetType;
+  description?: string;
+  asset_metadata?: Record<string, any>;
+}
+
+// Attack Surface with assets
+export interface AttackSurfaceWithAssets extends AttackSurface {
+  assets: Asset[];
+}
+
 // Pagination parameters
 export interface PaginationParams {
   skip?: number;

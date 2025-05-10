@@ -43,6 +43,18 @@ export function useAttackSurface(projectId: string, surfaceId: string) {
 }
 
 /**
+ * Custom hook to fetch a single attack surface by ID with its assets
+ */
+export function useAttackSurfaceWithAssets(projectId: string, surfaceId: string) {
+  return useQuery({
+    queryKey: [...attackSurfaceKeys.detail(projectId, surfaceId), 'with-assets'],
+    queryFn: () => projectsApi.getAttackSurfaceWithAssets(projectId, surfaceId),
+    enabled: !!projectId && !!surfaceId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
  * Custom hook to create a new attack surface
  */
 export function useCreateAttackSurface(projectId: string) {
