@@ -3,6 +3,11 @@ mcp.json
 */repomix-output.xml
 repomix-output.xml
 
+
+#jetbraims
+*/README_*
+README_*
+*./README_*
 # Logs
 logs
 *.log

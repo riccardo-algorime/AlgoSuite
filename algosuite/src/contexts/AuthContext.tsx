@@ -266,15 +266,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log('Refreshing token from AuthContext...');
 
       // Call the backend API to refresh the token
-      // Note: The backend expects refresh_token as a query parameter, not in the body
+      // Send refresh_token in the request body for better security
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`,
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/refresh`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          // No body needed as we're passing the token as a query parameter
+          body: JSON.stringify({ refresh_token: refreshToken })
         }
       );
 
@@ -340,5 +340,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     </AuthContext.Provider>
   );
 };
-
-

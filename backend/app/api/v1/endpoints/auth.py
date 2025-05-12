@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.db import get_db
 from app.api.dependencies.auth import get_current_user
 from app.core.config import settings
-from app.schemas.token import Token
+from app.schemas.token import Token, TokenRefresh
 from app.schemas.user import User
 from app.services.security import security_service
 from app.services.user import user_service
@@ -60,13 +60,13 @@ async def login(
 
 
 @router.post("/refresh", response_model=Token)
-async def refresh_token(refresh_token: str, db: Session = Depends(get_db)) -> Any:
+async def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)) -> Any:
     """
     Refresh access token
     """
     try:
         # Decode refresh token
-        payload = security_service.decode_token(refresh_token)
+        payload = security_service.decode_token(token_data.refresh_token)
         user_id = payload.get("sub")
 
         if not user_id:

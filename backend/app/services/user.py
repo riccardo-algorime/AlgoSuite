@@ -52,34 +52,7 @@ class UserService:
             # Convert SQLAlchemy model to dict
             return self._model_to_dict(db_user)
 
-        # If user doesn't exist but has a valid token, create a placeholder user
-        if user_id:
-            # Generate user data
-            email = f"user-{user_id[:8]}@example.com"
-            hashed_password = security_service.get_password_hash("password123")
-            full_name = f"User {user_id[:8]}"
-
-            # Create a new user in the database
-            db_user = UserModel(
-                id=user_id,
-                email=email,
-                hashed_password=hashed_password,
-                full_name=full_name,
-                is_active=True,
-                is_superuser=False
-            )
-
-            try:
-                db.add(db_user)
-                db.commit()
-                db.refresh(db_user)
-                print(f"Created new user in database: {user_id}")
-                return self._model_to_dict(db_user)
-            except Exception as e:
-                db.rollback()
-                print(f"Error creating user in database: {str(e)}")
-                return None
-
+        # Return None if user doesn't exist
         return None
 
     def get_by_email(self, db: Session, email: str) -> Optional[Dict[str, Any]]:

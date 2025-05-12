@@ -42,7 +42,7 @@ class SecurityService:
             expire = datetime.utcnow() + timedelta(
                 minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
             )
-        
+
         to_encode = {"exp": expire, "sub": str(subject)}
         encoded_jwt = jwt.encode(
             to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
@@ -54,9 +54,23 @@ class SecurityService:
         Decode and validate JWT token
         """
         try:
+            # Decode the token
             payload = jwt.decode(
                 token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
             )
+
+            # Explicitly verify token expiration
+            exp = payload.get("exp")
+            if exp is None:
+                raise jwt.JWTError("Token has no expiration claim")
+
+            if datetime.fromtimestamp(exp) < datetime.utcnow():
+                raise jwt.JWTError("Token has expired")
+
+            # Verify subject claim exists
+            if not payload.get("sub"):
+                raise jwt.JWTError("Token has no subject claim")
+
             return payload
         except jwt.JWTError as e:
             raise HTTPException(
