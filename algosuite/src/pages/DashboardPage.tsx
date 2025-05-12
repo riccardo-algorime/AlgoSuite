@@ -4,15 +4,15 @@ import {
   Container,
   Flex,
   Heading,
-  SimpleGrid,
   Spinner,
   Text,
   VStack,
 } from '@chakra-ui/react';
+import { Table } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../hooks/useProjects';
-import { ProjectCard } from '../components/ProjectCard';
 import { Project } from '../types';
+import { formatDate } from '../utils/formatters';
 
 export const DashboardPage = () => {
   const { data: projects, isLoading, isError } = useProjects();
@@ -112,18 +112,39 @@ export const DashboardPage = () => {
           </Box>
         )}
 
-        {/* Projects grid */}
+        {/* Projects table */}
         {!isLoading && !isError && projects && projects.length > 0 && (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onView={handleViewProject}
-                onEdit={handleEditProject}
-              />
-            ))}
-          </SimpleGrid>
+          <Box borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Table.Root variant="outline" size="md" interactive>
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeader>Name</Table.ColumnHeader>
+                  <Table.ColumnHeader>Description</Table.ColumnHeader>
+                  <Table.ColumnHeader>Created</Table.ColumnHeader>
+                  <Table.ColumnHeader>Updated</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="right">Actions</Table.ColumnHeader>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {projects.map((project) => (
+                  <Table.Row key={project.id}>
+                    <Table.Cell fontWeight="medium">{project.name}</Table.Cell>
+                    <Table.Cell>{project.description || '-'}</Table.Cell>
+                    <Table.Cell>{formatDate(project.created_at)}</Table.Cell>
+                    <Table.Cell>{formatDate(project.updated_at)}</Table.Cell>
+                    <Table.Cell textAlign="right">
+                      <Button size="sm" variant="ghost" onClick={() => handleViewProject(project)} mr={2}>
+                        View
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleEditProject(project)}>
+                        Edit
+                      </Button>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </Box>
         )}
       </VStack>
     </Container>

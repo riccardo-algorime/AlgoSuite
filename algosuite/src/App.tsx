@@ -15,6 +15,7 @@ import { CreateAttackSurfacePage } from './pages/CreateAttackSurfacePage'
 import { CreateAssetPage } from './pages/CreateAssetPage'
 import { EditProjectPage } from './pages/EditProjectPage'
 import { EditAttackSurfacePage } from './pages/EditAttackSurfacePage'
+import { StudioPage } from './pages/StudioPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './contexts/AuthContext'
 import { ChakraProvider } from '@chakra-ui/react'
@@ -122,6 +123,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <CreateAttackSurfacePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/studio"
+                  element={
+                    <ProtectedRoute>
+                      <StudioPage />
                     </ProtectedRoute>
                   }
                 />

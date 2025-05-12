@@ -42,6 +42,7 @@ export const Layout = ({ children }: LayoutProps) => {
   // Define the main navigation items
   const mainNavItems: NavItem[] = [
     { path: '/dashboard', label: 'Dashboard', icon: DashboardIcon, exists: true },
+    { path: '/studio', label: 'Studio', icon: TemplatesIcon, exists: true },
     { path: '/assets', label: 'Assets', icon: AssetsIcon, exists: false },
     { path: '/scans', label: 'Scans', icon: ScansIcon, exists: false },
     { path: '/templates', label: 'Templates', icon: TemplatesIcon, exists: false },
