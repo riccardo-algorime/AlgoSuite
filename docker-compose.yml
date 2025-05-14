@@ -14,7 +14,14 @@ services:
     environment:
       - VITE_API_BASE_URL=http://localhost:8000/api
     depends_on:
-      - backend
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   # Backend service
   backend:
@@ -26,20 +33,28 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/algosuite
+      - DATABASE_URL=postgresql+psycopg2://postgres:${DB_PASSWORD:-postgres}@db:5432/algosuite
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - SECRET_KEY=development_secret_key
+      - SECRET_KEY=${SECRET_KEY:-development_secret_key}
       - ENVIRONMENT=development
       - DEBUG=True
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - ALGORITHM=HS256
-      - OPENAI_API_KEY=sk-dummy-key-for-development-only
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-sk-dummy-key-for-development-only}
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
 
   # Celery worker
   celery_worker:
@@ -50,40 +65,95 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/algosuite
+      - DATABASE_URL=postgresql+psycopg2://postgres:${DB_PASSWORD:-postgres}@db:5432/algosuite
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - SECRET_KEY=development_secret_key
+      - SECRET_KEY=${SECRET_KEY:-development_secret_key}
       - ENVIRONMENT=development
       - DEBUG=True
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - ALGORITHM=HS256
-      - OPENAI_API_KEY=sk-dummy-key-for-development-only
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-sk-dummy-key-for-development-only}
     depends_on:
-      - backend
-      - redis
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 768M
 
   # Database service
   db:
-    image: ankane/pgvector:latest
-    ports:
-      - "5432:5432"
+    image: ankane/pgvector:v0.5.1  # Pinned version for stability
+    expose:
+      - "5432"  # Only expose to internal network, not to host
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}  # Use environment variable with fallback
       - POSTGRES_DB=algosuite
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+        -c shared_buffers=256MB
+        -c effective_cache_size=768MB
+        -c work_mem=16MB
+        -c maintenance_work_mem=64MB
+        -c max_connections=100
+        -c max_worker_processes=4
+        -c max_parallel_workers_per_gather=2
+        -c max_parallel_workers=4
+        -c random_page_cost=1.1
+        -c effective_io_concurrency=200
+        -c checkpoint_completion_target=0.9
+        -c wal_buffers=16MB
+        -c default_statistics_target=100
+        -c log_min_duration_statement=200
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
 
   # Redis service
   redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    image: redis:7.0-alpine  # Pinned version for stability
+    expose:
+      - "6379"  # Only expose to internal network, not to host
     volumes:
       - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      redis-server
+        --maxmemory 256mb
+        --maxmemory-policy allkeys-lru
+        --appendonly yes
+        --appendfsync everysec
+        --save 900 1
+        --save 300 10
+        --save 60 10000
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 384M
 
 
 
