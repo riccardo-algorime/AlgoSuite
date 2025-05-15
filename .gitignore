@@ -47,7 +47,7 @@ aigi/
 aigi/*
 
 # Project specific
-/docs/
+#/docs/#########################################################
 /scripts/
 
 # Python specific
