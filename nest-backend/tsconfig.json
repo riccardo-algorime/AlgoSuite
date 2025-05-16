@@ -12,11 +12,27 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
+    /* Type Checking Strictness */
+    "strict": true,
     "strictNullChecks": true,
-    "noImplicitAny": true,
+    "strictFunctionTypes": true,
     "strictBindCallApply": true,
-    "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    /* Additional Compiler Options */
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "pretty": true,
+    /* Path Aliases */
     "paths": {
       "@app/*": [
         "src/*"
@@ -29,7 +45,18 @@
       ],
       "@common/*": [
         "src/common/*"
+      ],
+      "@test/*": [
+        "test/*"
       ]
     }
-  }
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

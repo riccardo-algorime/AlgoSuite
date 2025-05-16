@@ -1,0 +1,136 @@
+name: Continuous Deployment
+
+on:
+  workflow_run:
+    workflows: [ "Continuous Integration" ]
+    types:
+      - completed
+    branches:
+      - main
+      - develop
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/develop' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'nest-backend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./nest-backend
+        run: npm ci
+
+      - name: Build for staging
+        working-directory: ./nest-backend
+        run: npm run build
+        env:
+          NODE_ENV: staging
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to Elastic Beanstalk
+        working-directory: ./nest-backend
+        run: |
+          zip -r deploy.zip dist package.json .env.staging
+          aws s3 cp deploy.zip s3://${{ secrets.AWS_S3_BUCKET }}/staging/deploy-${{ github.sha }}.zip
+          aws elasticbeanstalk create-application-version \
+            --application-name algosuite-api \
+            --version-label staging-${{ github.sha }} \
+            --source-bundle S3Bucket="${{ secrets.AWS_S3_BUCKET }}",S3Key="staging/deploy-${{ github.sha }}.zip"
+          aws elasticbeanstalk update-environment \
+            --environment-name algosuite-api-staging \
+            --version-label staging-${{ github.sha }}
+
+      - name: Notify deployment
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Staging deployment completed for version staging-${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  deploy-production:
+    name: Deploy to Production
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'nest-backend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./nest-backend
+        run: npm ci
+
+      - name: Build for production
+        working-directory: ./nest-backend
+        run: npm run build:prod
+        env:
+          NODE_ENV: production
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to Elastic Beanstalk
+        working-directory: ./nest-backend
+        run: |
+          zip -r deploy.zip dist package.json .env.production
+          aws s3 cp deploy.zip s3://${{ secrets.AWS_S3_BUCKET }}/production/deploy-${{ github.sha }}.zip
+          aws elasticbeanstalk create-application-version \
+            --application-name algosuite-api \
+            --version-label production-${{ github.sha }} \
+            --source-bundle S3Bucket="${{ secrets.AWS_S3_BUCKET }}",S3Key="production/deploy-${{ github.sha }}.zip"
+          aws elasticbeanstalk update-environment \
+            --environment-name algosuite-api-production \
+            --version-label production-${{ github.sha }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          body: |
+            Production release v${{ github.run_number }}
+            Commit: ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Notify deployment
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Production deployment completed for version v${{ github.run_number }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

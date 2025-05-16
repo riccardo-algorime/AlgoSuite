@@ -1,0 +1,100 @@
+name: Environment Provisioning
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to provision (staging or production)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  provision:
+    name: Provision Infrastructure
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: '1.5.0'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ./infrastructure/terraform
+        run: terraform init
+        env:
+          TF_VAR_environment: ${{ github.event.inputs.environment }}
+
+      - name: Terraform Plan
+        working-directory: ./infrastructure/terraform
+        run: terraform plan -var="environment=${{ github.event.inputs.environment }}" -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ./infrastructure/terraform
+        run: terraform apply -auto-approve tfplan
+
+      - name: Create or Update Environment Variables
+        run: |
+          # Create .env file for the environment
+          ENV_FILE="nest-backend/.env.${{ github.event.inputs.environment }}"
+          
+          # Get outputs from Terraform
+          DB_HOST=$(terraform -chdir=./infrastructure/terraform output -raw db_host)
+          DB_PORT=$(terraform -chdir=./infrastructure/terraform output -raw db_port)
+          DB_USERNAME=$(terraform -chdir=./infrastructure/terraform output -raw db_username)
+          DB_PASSWORD=$(terraform -chdir=./infrastructure/terraform output -raw db_password)
+          DB_DATABASE=$(terraform -chdir=./infrastructure/terraform output -raw db_database)
+          
+          # Create or update .env file
+          cat > $ENV_FILE << EOF
+          # Database Configuration
+          DB_HOST=$DB_HOST
+          DB_PORT=$DB_PORT
+          DB_USERNAME=$DB_USERNAME
+          DB_PASSWORD=$DB_PASSWORD
+          DB_DATABASE=$DB_DATABASE
+          DB_SYNCHRONIZE=false
+          DB_LOGGING=false
+          
+          # Application Configuration
+          PORT=3000
+          NODE_ENV=${{ github.event.inputs.environment }}
+          API_PREFIX=api
+          SWAGGER_PATH=api/docs
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          
+          # JWT Configuration
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
+          EOF
+
+      - name: Store Environment Configuration
+        uses: actions/upload-artifact@v3
+        with:
+          name: env-config-${{ github.event.inputs.environment }}
+          path: nest-backend/.env.${{ github.event.inputs.environment }}
+
+      - name: Notify Provisioning Complete
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Infrastructure provisioning completed for ${{ github.event.inputs.environment }} environment"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

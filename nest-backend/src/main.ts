@@ -1,6 +1,7 @@
 import {NestFactory} from '@nestjs/core';
 import {ValidationPipe} from '@nestjs/common';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import {ConfigService} from '@nestjs/config';
 import {AppModule} from './app.module';
 
 async function bootstrap() {
@@ -29,7 +30,9 @@ async function bootstrap() {
     app.enableCors();
 
     // Start the server
-    await app.listen(3000);
+    const configService = app.get(ConfigService);
+    const port = configService.get<number>('PORT', 3000);
+    await app.listen(port);
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
 

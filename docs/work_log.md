@@ -159,3 +159,140 @@ module, controller, and service, as well as an example feature module (users) to
 - nest-backend/src/modules/users/users.controller.ts
 - nest-backend/src/modules/users/users.service.ts
 - nest-backend/src/modules/users/entities/user.entity.ts
+
+### Task 18: Configure TypeScript
+
+**Status**: Completed
+**Summary**: Enhanced the TypeScript configuration for the NestJS project by updating the tsconfig.json file.
+Implemented comprehensive type checking strictness settings including strict mode, strictFunctionTypes,
+strictPropertyInitialization, and various other strict checks. Added appropriate compiler options such as
+esModuleInterop, moduleResolution, resolveJsonModule, and importHelpers. Configured path aliases for better module
+imports, including aliases for application modules, configuration, common utilities, and tests. Added include/exclude
+patterns to explicitly define which files should be processed by TypeScript.
+**Related Files**:
+
+- nest-backend/tsconfig.json
+
+### Task 19: Set up linting and formatting
+
+**Status**: Completed
+**Summary**: Implemented comprehensive linting and formatting for the NestJS project. Created an ESLint configuration
+with TypeScript-specific rules, including naming conventions, type checking, and code quality rules. Set up Prettier for
+consistent code formatting with rules for quotes, spacing, line length, and other style preferences. Configured
+pre-commit hooks using Husky and lint-staged to automatically run linting and formatting on staged files before commits.
+Created a detailed code style guide documenting TypeScript coding conventions, NestJS best practices, formatting rules,
+and the code review process.
+**Related Files**:
+
+- nest-backend/.eslintrc.js
+- nest-backend/.prettierrc
+- nest-backend/package.json
+- nest-backend/.husky/pre-commit
+- docs/code_style_guide.md
+
+### Task 20: Configure build process
+
+**Status**: Completed
+**Summary**: Enhanced the build process for the NestJS project with environment-specific configurations and optimized
+build scripts. Set up comprehensive build scripts for different environments (development, test, production) including
+clean builds and incremental builds. Configured environment variables with validation using Joi, creating
+environment-specific configuration files (.env.development, .env.test, .env.production) with appropriate settings for
+each environment. Implemented webpack with hot module replacement for development builds and optimized production
+builds. Created detailed build process documentation covering environment configuration, build scripts,
+environment-specific settings, continuous integration, and troubleshooting.
+**Related Files**:
+
+- nest-backend/package.json
+- nest-backend/src/app.module.ts
+- nest-backend/src/main.ts
+- nest-backend/.env.example
+- nest-backend/.env.development
+- nest-backend/.env.test
+- nest-backend/.env.production
+- nest-backend/webpack-hmr.config.js
+- docs/build_process.md
+
+### Task 21: Set up CI/CD pipeline
+
+**Status**: Completed
+**Summary**: Implemented a comprehensive CI/CD pipeline using GitHub Actions to automate building, testing, and
+deploying the NestJS application. Created three main workflows: a continuous integration workflow for building and
+testing the application, a continuous deployment workflow for deploying to staging and production environments, and an
+environment provisioning workflow for setting up the necessary infrastructure. Configured test automation with unit
+tests, e2e tests, and coverage reporting. Set up deployment workflows for staging and production environments using AWS
+Elastic Beanstalk, with proper versioning and notifications. Configured environment provisioning using Terraform for
+infrastructure as code, with environment-specific configurations and secrets management. Created detailed documentation
+explaining the CI/CD process, deployment environments, and troubleshooting procedures.
+**Related Files**:
+
+- .github/workflows/ci.yml
+- .github/workflows/cd.yml
+- .github/workflows/provision.yml
+- docs/ci_cd_pipeline.md
+
+### Task 22: Set up ORM
+
+**Status**: Completed
+**Summary**: Set up TypeORM as the Object-Relational Mapping (ORM) tool for the NestJS application. Installed the
+PostgreSQL driver (pg) to connect to the PostgreSQL database. Configured the database connection with appropriate
+settings for development, testing, and production environments. Set up entity repositories for all data models. Created
+a TypeORM configuration file for migrations and added scripts to package.json for generating and running migrations.
+**Related Files**:
+
+- nest-backend/package.json
+- nest-backend/typeorm.config.ts
+- nest-backend/src/common/database/database.module.ts
+
+### Task 23: Define entities
+
+**Status**: Completed
+**Summary**: Created a comprehensive set of entity classes based on the original FastAPI data models. Implemented a
+BaseEntity class with common fields (id, createdAt, updatedAt) that all entities inherit from. Created entity classes
+for User, Project, AttackSurface, Asset, Scan, ScanResult, and Finding. Defined enums for SurfaceType, AssetType,
+ScanType, ScanStatus, and Severity. Mapped relationships between entities using TypeORM decorators (OneToMany,
+ManyToOne, OneToOne, ManyToMany). Configured validation rules and set up indexes and constraints for better query
+performance.
+**Related Files**:
+
+- nest-backend/src/common/entities/base.entity.ts
+- nest-backend/src/modules/users/entities/user.entity.ts
+- nest-backend/src/modules/projects/entities/project.entity.ts
+- nest-backend/src/modules/attack-surfaces/entities/attack-surface.entity.ts
+- nest-backend/src/modules/assets/entities/asset.entity.ts
+- nest-backend/src/modules/scans/entities/scan.entity.ts
+- nest-backend/src/modules/scan-results/entities/scan-result.entity.ts
+- nest-backend/src/modules/findings/entities/finding.entity.ts
+- nest-backend/src/modules/attack-surfaces/enums/surface-type.enum.ts
+- nest-backend/src/modules/assets/enums/asset-type.enum.ts
+- nest-backend/src/modules/scans/enums/scan-type.enum.ts
+- nest-backend/src/modules/scans/enums/scan-status.enum.ts
+- nest-backend/src/modules/findings/enums/severity.enum.ts
+
+### Task 24: Create migration scripts
+
+**Status**: Completed
+**Summary**: Developed a migration system for managing database schema changes. Created a sample initial migration
+script that sets up the database schema for all entities, including creating enum types, tables, indexes, and foreign
+keys. Added scripts to package.json for generating, running, and reverting migrations. Created a comprehensive guide for
+using the migration system, including best practices and troubleshooting tips. Documented rollback procedures for
+reverting migrations if needed.
+**Related Files**:
+
+- nest-backend/src/migrations/1698765432100-InitialMigration.ts
+- nest-backend/docs/database-migrations.md
+
+### Task 25: Set up database connection
+
+**Status**: Completed
+**Summary**: Implemented a robust database connection system with advanced features for production use. Created a
+DatabaseModule that configures TypeORM with connection pooling for efficient resource usage. Developed a DatabaseService
+that provides transaction management, connection status checking, reconnection logic, and graceful shutdown. Implemented
+error handling and logging for database operations. Updated the app.module.ts to use the DatabaseModule and added
+environment variables for configuring the database connection. Created detailed documentation explaining the database
+connection setup, configuration options, and best practices.
+**Related Files**:
+
+- nest-backend/src/common/database/database.module.ts
+- nest-backend/src/common/database/database.service.ts
+- nest-backend/src/app.module.ts
+- nest-backend/docs/database-connection.md

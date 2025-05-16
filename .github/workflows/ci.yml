@@ -1,0 +1,77 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'nest-backend/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'nest-backend/**'
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: algosuite_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'nest-backend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./nest-backend
+        run: npm ci
+
+      - name: Lint
+        working-directory: ./nest-backend
+        run: npm run lint
+
+      - name: Build
+        working-directory: ./nest-backend
+        run: npm run build
+
+      - name: Run unit tests
+        working-directory: ./nest-backend
+        run: npm run test:cov
+
+      - name: Run e2e tests
+        working-directory: ./nest-backend
+        run: npm run test:e2e
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: algosuite_test
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./nest-backend/coverage
+          flags: nestjs
+          name: nestjs-codecov

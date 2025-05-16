@@ -1,11 +1,11 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {Column, Entity, OneToMany} from 'typeorm';
 import {Exclude} from 'class-transformer';
+import {BaseEntity} from '../../../common/entities/base.entity';
+import {Project} from '../../projects/entities/project.entity';
+import {Scan} from '../../scans/entities/scan.entity';
 
 @Entity()
-export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
-
+export class User extends BaseEntity {
     @Column({unique: true})
     email: string;
 
@@ -22,12 +22,15 @@ export class User {
     @Column({default: true})
     isActive: boolean;
 
+    @Column({default: false})
+    isSuperuser: boolean;
+
     @Column({type: 'simple-array', default: 'user'})
     roles: string[];
 
-    @CreateDateColumn()
-    createdAt: Date;
+    @OneToMany(() => Project, project => project.user)
+    projects: Project[];
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+    @OneToMany(() => Scan, scan => scan.user)
+    scans: Scan[];
 }
