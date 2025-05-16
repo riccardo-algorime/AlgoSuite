@@ -1,8 +1,8 @@
-export enum ScanType {
-    VULNERABILITY = 'vulnerability',
-    NETWORK = 'network',
-    WEB = 'web',
-    API = 'api',
-    MOBILE = 'mobile',
-    CLOUD = 'cloud'
+export enum ScanTypeEnum {
+  vulnerability = 'vulnerability',
+  network = 'network',
+  web = 'web',
+  api = 'api',
+  mobile = 'mobile',
+  cloud = 'cloud',
 }

@@ -1,15 +1,15 @@
-import {MigrationInterface, QueryRunner} from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class InitialMigration1698765432100 implements MigrationInterface {
-    name = 'InitialMigration1698765432100';
+  name = 'InitialMigration1698765432100';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        // This is a sample migration script
-        // In a real scenario, you would generate this using the migration:generate script
-        // which would automatically create the SQL statements based on your entity definitions
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // This is a sample migration script
+    // In a real scenario, you would generate this using the migration:generate script
+    // which would automatically create the SQL statements based on your entity definitions
 
-        // Create enum types
-        await queryRunner.query(`
+    // Create enum types
+    await queryRunner.query(`
       CREATE TYPE "public"."surface_type_enum" AS ENUM('web', 'api', 'mobile', 'network', 'cloud', 'iot', 'other');
       CREATE TYPE "public"."asset_type_enum" AS ENUM('server', 'website', 'database', 'application', 'endpoint', 'container', 'network_device', 'cloud_resource', 'other');
       CREATE TYPE "public"."scan_type_enum" AS ENUM('vulnerability', 'network', 'web', 'api', 'mobile', 'cloud');
@@ -17,8 +17,8 @@ export class InitialMigration1698765432100 implements MigrationInterface {
       CREATE TYPE "public"."severity_enum" AS ENUM('high', 'medium', 'low', 'info');
     `);
 
-        // Create tables
-        await queryRunner.query(`
+    // Create tables
+    await queryRunner.query(`
             CREATE TABLE "user"
             (
                 "id"           uuid              NOT NULL DEFAULT uuid_generate_v4(),
@@ -124,8 +124,8 @@ export class InitialMigration1698765432100 implements MigrationInterface {
             );
         `);
 
-        // Create indexes
-        await queryRunner.query(`
+    // Create indexes
+    await queryRunner.query(`
             CREATE INDEX "IDX_e12875dfb3b1d92d7d7c5377e22" ON "user" ("email");
             CREATE INDEX "IDX_4d68b1358bb5b766d3e78f32f57" ON "project" ("name");
             CREATE INDEX "IDX_9f5f1afb1a2b8e5e9b2b1f5f1a" ON "attack_surface" ("project_id");
@@ -139,8 +139,8 @@ export class InitialMigration1698765432100 implements MigrationInterface {
             CREATE INDEX "IDX_9f5f1afb1a2b8e5e9b2b1f5f1d" ON "finding" ("severity");
         `);
 
-        // Create foreign keys
-        await queryRunner.query(`
+    // Create foreign keys
+    await queryRunner.query(`
             ALTER TABLE "project"
                 ADD CONSTRAINT "FK_4d68b1358bb5b766d3e78f32f57" FOREIGN KEY ("created_by") REFERENCES "user" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
             ALTER TABLE "attack_surface"
@@ -158,11 +158,11 @@ export class InitialMigration1698765432100 implements MigrationInterface {
             ALTER TABLE "scan_result_findings"
                 ADD CONSTRAINT "FK_9f5f1afb1a2b8e5e9b2b1f5f1f" FOREIGN KEY ("finding_id") REFERENCES "finding" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        // Drop foreign keys
-        await queryRunner.query(`
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop foreign keys
+    await queryRunner.query(`
             ALTER TABLE "scan_result_findings" DROP CONSTRAINT "FK_9f5f1afb1a2b8e5e9b2b1f5f1f";
             ALTER TABLE "scan_result_findings" DROP CONSTRAINT "FK_9f5f1afb1a2b8e5e9b2b1f5f1e";
             ALTER TABLE "finding" DROP CONSTRAINT "FK_9f5f1afb1a2b8e5e9b2b1f5f1d";
@@ -173,8 +173,8 @@ export class InitialMigration1698765432100 implements MigrationInterface {
             ALTER TABLE "project" DROP CONSTRAINT "FK_4d68b1358bb5b766d3e78f32f57";
         `);
 
-        // Drop tables
-        await queryRunner.query(`
+    // Drop tables
+    await queryRunner.query(`
             DROP TABLE "scan_result_findings";
             DROP TABLE "finding";
             DROP TABLE "scan_result";
@@ -185,13 +185,13 @@ export class InitialMigration1698765432100 implements MigrationInterface {
             DROP TABLE "user";
         `);
 
-        // Drop enum types
-        await queryRunner.query(`
+    // Drop enum types
+    await queryRunner.query(`
       DROP TYPE "public"."severity_enum";
       DROP TYPE "public"."scan_status_enum";
       DROP TYPE "public"."scan_type_enum";
       DROP TYPE "public"."asset_type_enum";
       DROP TYPE "public"."surface_type_enum";
     `);
-    }
+  }
 }

@@ -17,25 +17,19 @@ Database connection settings are configured through environment variables in the
 
 ```
 # Database connection
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_DATABASE=algosuite
-DB_SYNCHRONIZE=false
-DB_LOGGING=false
-
-# Connection pool settings
-DB_POOL_MAX=20
-DB_POOL_IDLE_TIMEOUT=30000
-DB_POOL_CONNECTION_TIMEOUT=2000
-
-# Reconnection settings
-DB_RETRY_ATTEMPTS=10
-DB_RETRY_DELAY=3000
-
-# Migrations
-DB_MIGRATIONS_RUN=false
+dbHost=localhost
+dbPort=5432
+dbUsername=postgres
+dbPassword=postgres
+dbDatabase=algosuite
+dbSynchronize=false
+dbLogging=false
+dbPoolMax=20
+dbPoolIdleTimeout=30000
+dbPoolConnectionTimeout=2000
+dbRetryAttempts=10
+dbRetryDelay=3000
+dbMigrationsRun=false
 ```
 
 ### Environment Variables

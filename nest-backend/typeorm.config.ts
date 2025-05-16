@@ -6,15 +6,15 @@ dotenv.config({path: `.env.${process.env.NODE_ENV || 'development'}`});
 
 export default new DataSource({
     type: 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432', 10),
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || 'postgres',
-    database: process.env.DB_DATABASE || 'algosuite',
+    host: process.env.dbHost || 'localhost',
+    port: parseInt(process.env.dbPort || '5432', 10),
+    username: process.env.dbUsername || 'postgres',
+    password: process.env.dbPassword || 'postgres',
+    database: process.env.dbDatabase || 'algosuite',
     entities: ['src/**/*.entity{.ts,.js}'],
     migrations: ['src/migrations/*{.ts,.js}'],
     synchronize: false, // Never use synchronize in production
-    logging: process.env.DB_LOGGING === 'true',
+    logging: process.env.dbLogging === 'true',
     migrationsTableName: 'migrations',
     migrationsRun: false,
 });

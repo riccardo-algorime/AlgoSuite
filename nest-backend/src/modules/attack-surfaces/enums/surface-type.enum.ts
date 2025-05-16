@@ -1,9 +1,9 @@
-export enum SurfaceType {
-    WEB = 'web',
-    API = 'api',
-    MOBILE = 'mobile',
-    NETWORK = 'network',
-    CLOUD = 'cloud',
-    IOT = 'iot',
-    OTHER = 'other'
+export enum SurfaceTypeEnum {
+  web = 'web',
+  api = 'api',
+  mobile = 'mobile',
+  network = 'network',
+  cloud = 'cloud',
+  iot = 'iot',
+  other = 'other',
 }

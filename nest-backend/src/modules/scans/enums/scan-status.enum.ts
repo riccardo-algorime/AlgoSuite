@@ -1,7 +1,7 @@
-export enum ScanStatus {
-    PENDING = 'pending',
-    RUNNING = 'running',
-    COMPLETED = 'completed',
-    FAILED = 'failed',
-    CANCELLED = 'cancelled'
+export enum ScanStatusEnum {
+  pending = 'pending',
+  running = 'running',
+  completed = 'completed',
+  failed = 'failed',
+  cancelled = 'cancelled',
 }
