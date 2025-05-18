@@ -358,3 +358,31 @@ connection setup, configuration options, and best practices.
 - nest-backend/src/core/exceptions/all-exceptions.filter.ts
 - nest-backend/src/core/exceptions/exceptions.module.ts
 - docs/error_handling.md
+
+### Task 31: Create DTOs
+
+**Status**: Completed
+**Summary**: Created a comprehensive set of Data Transfer Objects (DTOs) for all modules in the NestJS application. Implemented request DTOs for creating and updating entities, and response DTOs for returning data to clients. Added validation rules using class-validator decorators and transformation logic using class-transformer. Added Swagger annotations for API documentation. Created barrel files (index.ts) for each module's DTOs to simplify imports.
+**Related Files**:
+
+- nest-backend/src/modules/projects/dto/create-project.dto.ts
+- nest-backend/src/modules/projects/dto/update-project.dto.ts
+- nest-backend/src/modules/projects/dto/project-response.dto.ts
+- nest-backend/src/modules/attack-surfaces/dto/create-attack-surface.dto.ts
+- nest-backend/src/modules/attack-surfaces/dto/update-attack-surface.dto.ts
+- nest-backend/src/modules/attack-surfaces/dto/attack-surface-response.dto.ts
+- nest-backend/src/modules/attack-surfaces/dto/attack-surface-with-assets.dto.ts
+- nest-backend/src/modules/assets/dto/create-asset.dto.ts
+- nest-backend/src/modules/assets/dto/update-asset.dto.ts
+- nest-backend/src/modules/assets/dto/asset-response.dto.ts
+- nest-backend/src/modules/scans/dto/create-scan.dto.ts
+- nest-backend/src/modules/scans/dto/update-scan.dto.ts
+- nest-backend/src/modules/scans/dto/scan-response.dto.ts
+- nest-backend/src/modules/findings/dto/finding-response.dto.ts
+- nest-backend/src/modules/scan-results/dto/scan-result-summary.dto.ts
+- nest-backend/src/modules/scan-results/dto/scan-result-response.dto.ts
+- nest-backend/src/modules/health/dto/health-check-response.dto.ts
+- nest-backend/src/modules/auth/dto/token-response.dto.ts
+- nest-backend/src/modules/auth/dto/token-refresh.dto.ts
+- nest-backend/src/modules/auth/dto/token-payload.dto.ts
+- nest-backend/src/modules/auth/dto/login.dto.ts

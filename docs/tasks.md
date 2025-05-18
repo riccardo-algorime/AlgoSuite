@@ -191,11 +191,11 @@
 
 ### 2. Feature Migration (Iterative)
 
-31. [] Create DTOs
-    - [] Define request DTOs
-    - [] Create response DTOs
-    - [] Implement validation rules
-    - [] Document DTO usage
+31. [x] Create DTOs
+    - [x] Define request DTOs
+    - [x] Create response DTOs
+    - [x] Implement validation rules
+    - [x] Document DTO usage
 
 32. [] Implement controllers
     - [] Create controller classes

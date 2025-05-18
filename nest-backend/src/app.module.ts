@@ -4,12 +4,12 @@ import { AppService } from './app.service';
 import { DatabaseModule } from '@common/database/database.module';
 import { CoreModule } from './core/core.module';
 import { UsersModule } from '@modules/users/users.module';
-import { ProjectsModule } from './modules/projects/projects.module';
-import { AttackSurfacesModule } from './modules/attack-surfaces/attack-surfaces.module';
-import { AssetsModule } from './modules/assets/assets.module';
-import { ScansModule } from './modules/scans/scans.module';
-import { ScanResultsModule } from './modules/scan-results/scan-results.module';
-import { FindingsModule } from './modules/findings/findings.module';
+import { ProjectsModule } from '@modules/projects/projects.module';
+import { AttackSurfacesModule } from '@modules/attack-surfaces/attack-surfaces.module';
+import { AssetsModule } from '@modules/assets/assets.module';
+import { ScansModule } from '@modules/scans/scans.module';
+import { ScanResultsModule } from '@modules/scan-results/scan-results.module';
+import { FindingsModule } from '@modules/findings/findings.module';
 
 @Module({
   imports: [
