@@ -12,6 +12,7 @@ import { ScanResultsModule } from '@modules/scan-results/scan-results.module';
 import { FindingsModule } from '@modules/findings/findings.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module'; // Changed to relative path
+import { AppThrottlerModule } from './core/throttler/throttler.module';
 
 @Module({
   imports: [
@@ -20,6 +21,9 @@ import { HealthModule } from './modules/health/health.module'; // Changed to rel
 
     // Core module
     CoreModule,
+
+    // Throttling (rate limiting)
+    AppThrottlerModule,
 
     // Feature modules
     AuthModule,

@@ -536,3 +536,33 @@ Each controller uses the appropriate NestJS route decorators, DTOs, and placehol
 
 **Swagger UI Location**:  
 - Accessible at `/api/docs` when the NestJS server is running.
+
+---
+
+### Task 37–39: Authentication, Authorization, and Endpoint Security
+
+**Status**: Completed  
+**Summary**:  
+- Implemented authentication using Passport, JWT, and bcrypt.
+- Added `LocalStrategy` and `JwtStrategy` for login and token validation.
+- Configured `AuthGuard('jwt')` and created `RolesGuard` for role-based access control.
+- Defined user roles in `roles.enum.ts` and created the `@Roles()` decorator.
+- Applied guards and role decorators to controllers (e.g., `UsersController`, `ProjectsController`).
+- Integrated global rate limiting using `@nestjs/throttler` and a custom `AppThrottlerModule`.
+- Updated `AppModule` to enable global throttling.
+- Updated API documentation to reflect authentication, authorization, and rate limiting requirements.
+
+**Related Files**:
+
+- nest-backend/src/modules/auth/local.strategy.ts
+- nest-backend/src/modules/auth/jwt.strategy.ts
+- nest-backend/src/modules/auth/roles.enum.ts
+- nest-backend/src/modules/auth/roles.decorator.ts
+- nest-backend/src/modules/auth/roles.guard.ts
+- nest-backend/src/modules/users/users.controller.ts
+- nest-backend/src/modules/projects/projects.controller.ts
+- nest-backend/src/core/throttler/throttler.module.ts
+- nest-backend/src/app.module.ts
+- nest-backend/package.json
+- docs/api_documentation_strategy.md
+- docs/authentication_strategy.md

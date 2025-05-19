@@ -14,14 +14,16 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto, UpdateProjectDto, ProjectResponseDto } from './dto';
 import { Project } from './entities/project.entity';
 import { plainToInstance } from 'class-transformer';
- // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
- // import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/roles.enum';
 
 @ApiTags('projects')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiBearerAuth()
 @Controller('projects')
- // @UseGuards(JwtAuthGuard)
 export class ProjectsController {
   constructor(private readonly _projectsService: ProjectsService) {}
 

@@ -1,14 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-// import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/roles.enum';
 
 @ApiTags('users')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly _usersService: UsersService) {}
@@ -17,6 +20,9 @@ export class UsersController {
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
+  // Registration endpoint: remove guards if public registration is allowed
+  // If only admins can create users, uncomment the next line:
+  // @Roles(Role.Admin)
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this._usersService.create(createUserDto);
   }
@@ -25,8 +31,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   findAll(): Promise<User[]> {
     return this._usersService.findAll();
   }
