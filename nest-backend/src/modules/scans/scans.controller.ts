@@ -95,4 +95,12 @@ export class ScansController {
   async remove(@Param('id') id: string): Promise<void> {
     await this._scansService.remove(id);
   }
+
+  @Get(':id/results')
+  @ApiOperation({ summary: 'Get results for a specific scan' })
+  @ApiResponse({ status: 200, description: 'Return the scan results.' })
+  async getResults(@Param('id') id: string): Promise<any> {
+    // return this._scansService.getResults(id);
+    return Promise.resolve(undefined); // Placeholder
+  }
 }
