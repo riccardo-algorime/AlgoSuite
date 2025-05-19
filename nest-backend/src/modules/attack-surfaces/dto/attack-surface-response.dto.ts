@@ -9,14 +9,14 @@ export class AttackSurfaceResponseDto {
     description: 'Attack surface ID',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
-  id: string;
+  id!: string;
 
   @Expose()
   @ApiProperty({
     description: 'Project ID',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
-  projectId: string;
+  projectId!: string;
 
   @Expose()
   @ApiProperty({
@@ -24,7 +24,7 @@ export class AttackSurfaceResponseDto {
     enum: SurfaceTypeEnum,
     example: 'web',
   })
-  surfaceType: SurfaceTypeEnum;
+  surfaceType!: SurfaceTypeEnum;
 
   @Expose()
   @ApiProperty({
@@ -32,7 +32,7 @@ export class AttackSurfaceResponseDto {
     example: 'Main website and customer portal',
     nullable: true,
   })
-  description: string | null;
+  description!: string | null;
 
   @Expose()
   @ApiProperty({
@@ -40,19 +40,19 @@ export class AttackSurfaceResponseDto {
     example: { domain: 'example.com', includeSubdomains: true },
     nullable: true,
   })
-  config: Record<string, unknown> | null;
+  config!: Record<string, unknown> | null;
 
   @Expose()
   @ApiProperty({
     description: 'Attack surface creation timestamp',
     example: '2023-01-01T00:00:00.000Z',
   })
-  createdAt: Date;
+  createdAt!: Date;
 
   @Expose()
   @ApiProperty({
     description: 'Attack surface last update timestamp',
     example: '2023-01-01T00:00:00.000Z',
   })
-  updatedAt: Date;
+  updatedAt!: Date;
 }
