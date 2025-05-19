@@ -386,3 +386,25 @@ connection setup, configuration options, and best practices.
 - nest-backend/src/modules/auth/dto/token-refresh.dto.ts
 - nest-backend/src/modules/auth/dto/token-payload.dto.ts
 - nest-backend/src/modules/auth/dto/login.dto.ts
+
+### Task 32: Implement controllers
+
+**Status**: Completed
+**Summary**: Implemented all required NestJS controller classes and endpoints to match the FastAPI API specification. This includes:
+- UsersController: all user endpoints, including `/users/me`, `/users/ensure-in-db`, and `/users/{user_id}`
+- AuthController and RegisterController: all authentication and registration endpoints
+- HealthController: health check endpoint
+- ProjectsController, AttackSurfacesController, AssetsController: all nested endpoints for projects, attack surfaces, and assets
+- ScansController: all scan endpoints, including `/scans/{scan_id}/results`
+
+Each controller uses the appropriate NestJS route decorators, DTOs, and placeholder service calls, with comments for future authentication and authorization integration. The structure is now ready for business logic implementation in the service layer.
+
+**Related Files**:
+
+- nest-backend/src/modules/users/users.controller.ts
+- nest-backend/src/modules/auth/auth.controller.ts
+- nest-backend/src/modules/health/health.controller.ts
+- nest-backend/src/modules/projects/projects.controller.ts
+- nest-backend/src/modules/attack-surfaces/attack-surfaces.controller.ts
+- nest-backend/src/modules/assets/assets.controller.ts
+- nest-backend/src/modules/scans/scans.controller.ts

@@ -7,30 +7,30 @@ import { Scan } from '../../scans/entities/scan.entity';
 @Entity()
 export class User extends BaseEntity {
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  firstName: string;
+  firstName!: string;
 
   @Column()
-  lastName: string;
+  lastName!: string;
 
   @Column()
   @Exclude()
-  password: string;
+  hashedPassword!: string; // Renamed from password
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Column({ default: false })
-  isSuperuser: boolean;
+  isSuperuser!: boolean;
 
   @Column({ type: 'simple-array', default: 'user' })
-  roles: string[];
+  roles!: string[];
 
   @OneToMany(() => Project, project => project.user)
-  projects: Project[];
+  projects!: Project[];
 
   @OneToMany(() => Scan, scan => scan.user)
-  scans: Scan[];
+  scans!: Scan[];
 }

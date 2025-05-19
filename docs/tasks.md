@@ -197,11 +197,11 @@
     - [x] Implement validation rules
     - [x] Document DTO usage
 
-32. [] Implement controllers
-    - [] Create controller classes
-    - [] Map routes to methods
-    - [] Implement request handling
-    - [] Configure route decorators
+32. [x] Implement controllers
+    - [x] Create controller classes
+    - [x] Map routes to methods
+    - [x] Implement request handling
+    - [x] Configure route decorators
 
 33. [] Develop services
     - [] Implement business logic

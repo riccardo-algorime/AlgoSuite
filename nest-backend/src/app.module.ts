@@ -10,6 +10,8 @@ import { AssetsModule } from '@modules/assets/assets.module';
 import { ScansModule } from '@modules/scans/scans.module';
 import { ScanResultsModule } from '@modules/scan-results/scan-results.module';
 import { FindingsModule } from '@modules/findings/findings.module';
+import { AuthModule } from '@modules/auth/auth.module';
+import { HealthModule } from './modules/health/health.module'; // Changed to relative path
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { FindingsModule } from '@modules/findings/findings.module';
     CoreModule,
 
     // Feature modules
+    AuthModule,
     UsersModule,
     ProjectsModule,
     AttackSurfacesModule,
@@ -27,6 +30,7 @@ import { FindingsModule } from '@modules/findings/findings.module';
     ScansModule,
     ScanResultsModule,
     FindingsModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

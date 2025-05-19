@@ -14,4 +14,19 @@ export class TokenPayloadDto {
     required: false,
   })
   exp?: number;
+
+  @ApiProperty({
+    description: 'User email',
+    example: 'user@example.com',
+    required: true,
+  })
+  email!: string; // Definite assignment assertion
+
+  @ApiProperty({
+    description: 'User roles',
+    example: ['user', 'admin'],
+    isArray: true,
+    required: false,
+  })
+  roles?: string[];
 }

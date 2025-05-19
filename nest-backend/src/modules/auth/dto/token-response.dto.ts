@@ -1,17 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../../users/entities/user.entity';
 
 export class TokenResponseDto {
   @ApiProperty({
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  accessToken: string;
-
-  @ApiProperty({
-    description: 'Token type',
-    example: 'bearer',
-  })
-  tokenType: string;
+  accessToken!: string; // Definite assignment assertion
 
   @ApiProperty({
     description: 'JWT refresh token',
@@ -19,4 +14,10 @@ export class TokenResponseDto {
     required: false,
   })
   refreshToken?: string;
+
+  @ApiProperty({
+    description: 'User details',
+    type: () => User, // Assuming User entity is defined and can be referenced
+  })
+  user!: Omit<User, 'password' | 'hashedPassword'>; // Definite assignment assertion
 }
