@@ -259,11 +259,17 @@
 
 ### 1. Comprehensive Testing
 
-40. [] Unit testing
-    - [] Test individual components
-    - [] Mock dependencies
-    - [] Verify business logic
-    - [] Document test coverage
+40. [~] Unit testing
+    - [x] Scaffolded unit test spec files for all core services in NestJS backend
+    - [x] Mocked repositories/dependencies in test setup
+    - [ ] Test all public methods of each service
+    - [ ] Verify business logic and edge cases
+    - [ ] Achieve 80%+ test coverage
+    - [x] Documented test coverage and next steps in docs/test_coverage.md
+
+      **Status:**  
+      - All core service files in `nest-backend/src/modules` now have a corresponding `*.service.spec.ts` file with a basic test and mock setup.
+      - Next: Expand tests for all service methods, cover edge cases, and reach target coverage.
 
 41. [] Integration testing
     - [] Test component interactions

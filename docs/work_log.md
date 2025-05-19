@@ -566,3 +566,37 @@ Each controller uses the appropriate NestJS route decorators, DTOs, and placehol
 - nest-backend/package.json
 - docs/api_documentation_strategy.md
 - docs/authentication_strategy.md
+
+## Phase 4: Testing and Validation
+
+### Task 40: Unit testing
+
+**Status**: In Progress  
+**Summary**:  
+- Scaffolded unit test spec files for all core service classes in the NestJS backend (`*.service.spec.ts`).
+- Each spec file includes a basic test to verify the service is defined and a mock setup for repositories or dependencies.
+- The following files were created:
+    - nest-backend/src/modules/users/users.service.spec.ts
+    - nest-backend/src/modules/projects/projects.service.spec.ts
+    - nest-backend/src/modules/assets/assets.service.spec.ts
+    - nest-backend/src/modules/attack-surfaces/attack-surfaces.service.spec.ts
+    - nest-backend/src/modules/scans/scans.service.spec.ts
+    - nest-backend/src/modules/scan-results/scan-results.service.spec.ts
+    - nest-backend/src/modules/findings/findings.service.spec.ts
+    - nest-backend/src/modules/health/health.service.spec.ts
+    - nest-backend/src/modules/auth/auth.service.spec.ts
+- Updated documentation in [docs/test_coverage.md](test_coverage.md) to reflect the current state and next steps.
+- Next: Expand each spec file to test all public methods, cover edge cases, and achieve 80%+ test coverage.
+
+**Related Files**:
+
+- nest-backend/src/modules/users/users.service.spec.ts
+- nest-backend/src/modules/projects/projects.service.spec.ts
+- nest-backend/src/modules/assets/assets.service.spec.ts
+- nest-backend/src/modules/attack-surfaces/attack-surfaces.service.spec.ts
+- nest-backend/src/modules/scans/scans.service.spec.ts
+- nest-backend/src/modules/scan-results/scan-results.service.spec.ts
+- nest-backend/src/modules/findings/findings.service.spec.ts
+- nest-backend/src/modules/health/health.service.spec.ts
+- nest-backend/src/modules/auth/auth.service.spec.ts
+- docs/test_coverage.md

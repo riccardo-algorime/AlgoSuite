@@ -1,3 +1,41 @@
+# NestJS Backend Unit Test Coverage
+
+## Service Test Scaffolding
+
+All core service files in `nest-backend/src/modules` now have a corresponding unit test spec file with a basic scaffold:
+
+- users/users.service.spec.ts
+- projects/projects.service.spec.ts
+- assets/assets.service.spec.ts
+- attack-surfaces/attack-surfaces.service.spec.ts
+- scans/scans.service.spec.ts
+- scan-results/scan-results.service.spec.ts
+- findings/findings.service.spec.ts
+- health/health.service.spec.ts
+- auth/auth.service.spec.ts
+
+Each spec file includes:
+- A basic test to verify the service is defined
+- A mock repository or dependencies (where applicable)
+- A structure ready for expansion with tests for all public methods
+
+## Next Steps for Full Coverage
+
+- Expand each spec file to test all public methods of the service
+- Mock all dependencies (repositories, other services, etc.)
+- Cover normal behavior, edge cases, and error handling
+- Ensure permission/access logic is tested where applicable
+- Run `npm run test:cov` to check coverage
+- Achieve and maintain 80%+ coverage for lines, branches, and functions
+
+## How to Run Tests
+
+- `npm run test` — run all tests
+- `npm run test:watch` — run tests in watch mode
+- `npm run test:cov` — run tests with coverage report
+
+---
+
 # Test Coverage Assessment
 
 ## Test Structure
