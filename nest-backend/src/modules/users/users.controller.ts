@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 // import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -24,8 +24,9 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
   // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
   findAll(): Promise<User[]> {
     return this._usersService.findAll();
   }
@@ -34,53 +35,62 @@ export class UsersController {
   @ApiOperation({ summary: 'Get a user by id' })
   @ApiResponse({ status: 200, description: 'Return the user.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
   findOne(@Param('id') id: string): Promise<User> {
-    return this._usersService.findOne(+id);
+    return this._usersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({ status: 200, description: 'User has been successfully updated.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
-    return this._usersService.update(+id, updateUserDto);
+    return this._usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user' })
   @ApiResponse({ status: 200, description: 'User has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
   remove(@Param('id') id: string): Promise<User> {
-    return this._usersService.remove(+id);
+    return this._usersService.remove(id);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
   @Get('me')
   @ApiOperation({ summary: 'Get current user' })
   @ApiResponse({ status: 200, description: 'Return the current user.' })
-  getMe(@Req() req): Promise<User> {
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  getMe(): Promise<User> {
     // return this._usersService.getMe(req.user);
-    return Promise.resolve(undefined); // Placeholder
+    return Promise.resolve(null as any); // Placeholder
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
   @Post('ensure-in-db')
   @ApiOperation({ summary: 'Ensure the current user exists in the database' })
   @ApiResponse({ status: 200, description: 'Return the current user.' })
-  ensureInDb(@Req() req): Promise<User> {
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  ensureInDb(@Req() req: any): Promise<User> {
     // return this._usersService.ensureInDb(req.user);
-    return Promise.resolve(undefined); // Placeholder
+    return Promise.resolve(null as any); // Placeholder
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
   @Put('me')
   @ApiOperation({ summary: 'Update current user' })
   @ApiResponse({ status: 200, description: 'User has been successfully updated.' })
-  updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  updateMe(@Req() req: any, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     // return this._usersService.updateMe(req.user, updateUserDto);
-    return Promise.resolve(undefined); // Placeholder
+    return Promise.resolve(null as any); // Placeholder
   }
 }

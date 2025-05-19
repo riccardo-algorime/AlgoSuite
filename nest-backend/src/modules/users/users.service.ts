@@ -55,7 +55,7 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
-    
+
     // If password is being updated, hash it
     if (updateUserDto.password) {
       const bcrypt = await import('bcrypt'); // Dynamic import

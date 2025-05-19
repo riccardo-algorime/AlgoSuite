@@ -1,99 +1,129 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto, UpdateProjectDto, ProjectResponseDto } from './dto';
 import { Project } from './entities/project.entity';
 import { plainToInstance } from 'class-transformer';
-// Uncomment when auth is implemented
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-// import { CurrentUser } from '../auth/decorators/current-user.decorator';
-// import { User } from '../users/entities/user.entity';
+ // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+ // import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @ApiTags('projects')
+@ApiBearerAuth()
 @Controller('projects')
-// @UseGuards(JwtAuthGuard)
-// @ApiBearerAuth()
+ // @UseGuards(JwtAuthGuard)
 export class ProjectsController {
   constructor(private readonly _projectsService: ProjectsService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new project' })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Project has been successfully created.',
-    type: ProjectResponseDto
+    type: ProjectResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async create(
     @Body() createProjectDto: CreateProjectDto,
     // @CurrentUser() user: User
   ): Promise<ProjectResponseDto> {
-    // For now, hardcode a user ID until auth is implemented
-    const userId = '123e4567-e89b-12d3-a456-426614174000';
-    
-    const project = await this._projectsService.create({
-      ...createProjectDto,
-      createdBy: userId, // user.id when auth is implemented
-    });
-    
-    return plainToInstance(ProjectResponseDto, project);
+    // const project = await this._projectsService.create(
+    //   createProjectDto,
+    //   user
+    // );
+    // return plainToInstance(ProjectResponseDto, project);
+    throw new Error('Auth not implemented: uncomment and implement when ready.');
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all projects for the current user' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Return all projects for the current user.',
-    type: [ProjectResponseDto]
+    type: [ProjectResponseDto],
   })
-  @ApiQuery({ name: 'skip', required: false, type: Number, description: 'Number of records to skip' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of records to return' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiQuery({
+    name: 'skip',
+    required: false,
+    type: Number,
+    description: 'Number of records to skip',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of records to return',
+  })
   async findAll(
-    @Query('skip') skip?: number,
-    @Query('limit') limit?: number,
     // @CurrentUser() user: User
+    @Query('skip') skip?: number,
+    @Query('limit') limit?: number
   ): Promise<ProjectResponseDto[]> {
-    // For now, hardcode a user ID until auth is implemented
-    const userId = '123e4567-e89b-12d3-a456-426614174000';
-    
-    const projects = await this._projectsService.findByUser(userId); // user.id when auth is implemented
-    return plainToInstance(ProjectResponseDto, projects);
+    // const projects = await this._projectsService.findAllByUser(user);
+    // return projects.map(project => plainToInstance(ProjectResponseDto, project));
+    throw new Error('Auth not implemented: uncomment and implement when ready.');
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a project by id' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Return the project.',
-    type: ProjectResponseDto
+    type: ProjectResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Project not found.' })
-  async findOne(@Param('id') id: string): Promise<ProjectResponseDto> {
-    const project = await this._projectsService.findOne(id);
-    return plainToInstance(ProjectResponseDto, project);
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async findOne(
+    @Param('id') id: string,
+    // @CurrentUser() user: User
+  ): Promise<ProjectResponseDto> {
+    // const project = await this._projectsService.findOne(id, user);
+    // return plainToInstance(ProjectResponseDto, project);
+    throw new Error('Auth not implemented: uncomment and implement when ready.');
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a project' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Project has been successfully updated.',
-    type: ProjectResponseDto
+    type: ProjectResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Project not found.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async update(
-    @Param('id') id: string, 
-    @Body() updateProjectDto: UpdateProjectDto
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+    // @CurrentUser() user: User
   ): Promise<ProjectResponseDto> {
-    const project = await this._projectsService.update(id, updateProjectDto);
-    return plainToInstance(ProjectResponseDto, project);
+    // const project = await this._projectsService.update(id, updateProjectDto, user);
+    // return plainToInstance(ProjectResponseDto, project);
+    throw new Error('Auth not implemented: uncomment and implement when ready.');
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a project' })
   @ApiResponse({ status: 200, description: 'Project has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Project not found.' })
-  async remove(@Param('id') id: string): Promise<void> {
-    await this._projectsService.remove(id);
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async remove(
+    @Param('id') id: string,
+    // @CurrentUser() user: User
+  ): Promise<void> {
+    // await this._projectsService.remove(id, user);
+    throw new Error('Auth not implemented: uncomment and implement when ready.');
   }
 }

@@ -29,12 +29,12 @@ export class ScansService {
 
   // For regular users to see their own scans
   findAllByUser(currentUser: CurrentUser): Promise<Scan[]> {
-    const options: FindManyOptions<Scan> = { 
-      where: { user: { id: currentUser.id } }, 
-      relations: ['user', 'findings', 'result'] 
+    const options: FindManyOptions<Scan> = {
+      where: { user: { id: currentUser.id } },
+      relations: ['user', 'findings', 'result'],
     };
     if (currentUser.isSuperuser || (currentUser.roles && currentUser.roles.includes('admin'))) {
-       delete options.where;
+      delete options.where;
     }
     return this._scansRepository.find(options);
   }
@@ -49,7 +49,11 @@ export class ScansService {
       throw new NotFoundException(`Scan with ID ${id} not found`);
     }
 
-    if (!currentUser.isSuperuser && !(currentUser.roles && currentUser.roles.includes('admin')) && scan.user?.id !== currentUser.id) {
+    if (
+      !currentUser.isSuperuser &&
+      !(currentUser.roles && currentUser.roles.includes('admin')) &&
+      scan.user?.id !== currentUser.id
+    ) {
       throw new ForbiddenException('You do not have permission to access this scan.');
     }
     return scan;
@@ -64,7 +68,7 @@ export class ScansService {
     };
     const scan = this._scansRepository.create(scanToCreate);
     const savedScan = await this._scansRepository.save(scan);
-    
+
     // TODO: Trigger actual scan execution via a queue or background task
     this.logger.log(`Scan ${savedScan.id} created. TODO: Trigger actual scan execution.`);
     // For now, we might simulate by updating status after a delay or just leave as pending.
@@ -72,7 +76,7 @@ export class ScansService {
 
     return savedScan;
   }
-  
+
   // Placeholder for triggering scan
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async triggerScanExecution(scanId: string): Promise<void> {
@@ -91,15 +95,17 @@ export class ScansService {
     // }, 1000);
   }
 
-
   async update(id: string, scanData: Partial<Scan>, currentUser: CurrentUser): Promise<Scan> {
     const scan = await this.findOne(id, currentUser); // Ownership check included
 
     // Prevent changing critical fields like createdBy or target easily after creation by non-admins
-    if ((scanData.createdBy && scanData.createdBy !== scan.createdBy) || (scanData.target && scanData.target !== scan.target)) {
-        if (!currentUser.isSuperuser && !(currentUser.roles && currentUser.roles.includes('admin'))) {
-            throw new ForbiddenException('You do not have permission to change critical scan details.');
-        }
+    if (
+      (scanData.createdBy && scanData.createdBy !== scan.createdBy) ||
+      (scanData.target && scanData.target !== scan.target)
+    ) {
+      if (!currentUser.isSuperuser && !(currentUser.roles && currentUser.roles.includes('admin'))) {
+        throw new ForbiddenException('You do not have permission to change critical scan details.');
+      }
     }
 
     this._scansRepository.merge(scan, scanData);
@@ -109,14 +115,16 @@ export class ScansService {
   // updateStatus might be called internally by a worker, or by an admin
   async updateStatus(id: string, status: ScanStatusEnum, currentUser?: CurrentUser): Promise<Scan> {
     let scan: Scan;
-    if (currentUser) { // If called by a user, check ownership
-        scan = await this.findOne(id, currentUser); // findOne already throws if not found or no permission
-    } else { // Internal call (e.g., by a worker), fetch directly
-        const foundScan = await this._scansRepository.findOne({ where: { id } });
-        if (!foundScan) {
-            throw new NotFoundException(`Scan with ID ${id} not found for internal status update.`);
-        }
-        scan = foundScan;
+    if (currentUser) {
+      // If called by a user, check ownership
+      scan = await this.findOne(id, currentUser); // findOne already throws if not found or no permission
+    } else {
+      // Internal call (e.g., by a worker), fetch directly
+      const foundScan = await this._scansRepository.findOne({ where: { id } });
+      if (!foundScan) {
+        throw new NotFoundException(`Scan with ID ${id} not found for internal status update.`);
+      }
+      scan = foundScan;
     }
     scan.status = status;
     this.logger.log(`Scan ${id} status updated to ${status}`);

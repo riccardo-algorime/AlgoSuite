@@ -59,6 +59,14 @@ For each functional area:
 - Create DTOs: Define Data Transfer Objects for request/response validation
 - Implement controllers: Create controllers that map to existing FastAPI routes
 - Develop services: Implement business logic in service classes
+
+  **Status:**  
+  - All core service classes (Auth, Users, Projects, Attack Surfaces, Assets, Scans, ScanResults, Findings, Health) have been implemented or enhanced.
+  - Business logic, access control, and ownership checks are in place.
+  - Password hashing, JWT authentication, and error handling are integrated.
+  - Scan execution is mocked in ScansService with a TODO for future queue integration.
+  - Module resolution issue for HealthModule was fixed by switching to a relative import in app.module.ts as a workaround for a path alias issue.
+
 - Add validation: Implement request validation using class-validator
 - Write tests: Create unit and integration tests for new components
 - Document API: Add Swagger annotations

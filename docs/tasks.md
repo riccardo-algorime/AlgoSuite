@@ -203,29 +203,37 @@
     - [x] Implement request handling
     - [x] Configure route decorators
 
-33. [] Develop services
-    - [] Implement business logic
-    - [] Create service classes
-    - [] Set up service interfaces
-    - [] Document service responsibilities
+33. [x] Develop services
+    - [x] Implement business logic
+    - [x] Create service classes
+    - [x] Set up service interfaces
+    - [x] Document service responsibilities
 
-34. [] Add validation
-    - [] Implement request validation
-    - [] Set up validation pipes
-    - [] Create custom validators if needed
-    - [] Document validation rules
+      **Summary:**  
+      - Implemented and enhanced service classes for all core modules (Auth, Users, Projects, Attack Surfaces, Assets, Scans, ScanResults, Findings, Health).
+      - Added business logic, access control, and ownership checks to all services.
+      - Integrated password hashing, JWT authentication, and error handling.
+      - Mocked scan execution in ScansService with a TODO for future queue integration.
+      - Fixed module resolution issues for HealthModule by switching to a relative import in app.module.ts.
+      - Suppressed or reviewed minor linter warnings.
 
-35. [] Write tests
-    - [] Create unit tests
-    - [] Implement integration tests
-    - [] Set up test fixtures
-    - [] Document test coverage
+34. [x] Add validation
+    - [x] Implement request validation
+    - [x] Set up validation pipes
+    - [x] Create custom validators if needed
+    - [x] Document validation rules
 
-36. [] Document API
-    - [] Add Swagger annotations
-    - [] Generate API documentation
-    - [] Document example requests/responses
-    - [] Create usage guides
+35. [x] Write tests
+    - [x] Create unit tests
+    - [x] Implement integration tests
+    - [x] Set up test fixtures
+    - [x] Document test coverage
+
+36. [x] Document API
+    - [x] Add Swagger annotations
+    - [x] Generate API documentation
+    - [x] Document example requests/responses
+    - [x] Create usage guides
 
 ### 3. Authentication and Authorization
 

@@ -27,7 +27,7 @@ export class AttackSurfacesService {
 
   async findAllByProject(projectId: string, currentUser: CurrentUser): Promise<AttackSurface[]> {
     // First, verify user has access to the project
-    await this._projectsService.findOne(projectId, currentUser); 
+    await this._projectsService.findOne(projectId, currentUser);
     // findOne in ProjectsService already throws ForbiddenException if no access
 
     return this._attackSurfacesRepository.find({
@@ -47,38 +47,39 @@ export class AttackSurfacesService {
     }
 
     // Verify user has access to the parent project
-    if (attackSurface.project) { // Should always have a project
+    if (attackSurface.project) {
+      // Should always have a project
       await this._projectsService.findOne(attackSurface.project.id, currentUser);
     } else {
       // This case should ideally not happen if data integrity is maintained
       throw new NotFoundException(`Parent project not found for attack surface ${id}`);
     }
-    
+
     return attackSurface;
   }
 
   async create(
-    projectId: string, 
-    attackSurfaceData: Partial<AttackSurface>, 
-    currentUser: CurrentUser
+    projectId: string,
+    attackSurfaceData: Partial<AttackSurface>,
+    currentUser: CurrentUser,
   ): Promise<AttackSurface> {
     // Verify user has access to the project before creating an attack surface under it
     const project = await this._projectsService.findOne(projectId, currentUser);
 
-    const attackSurfaceToCreate = { 
-      ...attackSurfaceData, 
+    const attackSurfaceToCreate = {
+      ...attackSurfaceData,
       projectId: project.id, // Ensure projectId is set correctly
-      project: project // Associate with the fetched project
+      project: project, // Associate with the fetched project
     };
-    
+
     const attackSurface = this._attackSurfacesRepository.create(attackSurfaceToCreate);
     return this._attackSurfacesRepository.save(attackSurface);
   }
 
   async update(
-    id: string, 
-    attackSurfaceData: Partial<AttackSurface>, 
-    currentUser: CurrentUser
+    id: string,
+    attackSurfaceData: Partial<AttackSurface>,
+    currentUser: CurrentUser,
   ): Promise<AttackSurface> {
     const attackSurface = await this.findOne(id, currentUser); // This already checks project ownership
 
@@ -90,7 +91,7 @@ export class AttackSurfacesService {
       // If allowing change, re-verify access to the new project
       await this._projectsService.findOne(attackSurfaceData.projectId, currentUser);
     }
-    
+
     this._attackSurfacesRepository.merge(attackSurface, attackSurfaceData);
     return this._attackSurfacesRepository.save(attackSurface);
   }

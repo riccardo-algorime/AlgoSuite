@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+// eslint-disable-next-line max-len
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 // import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { LoginDto } from './dto/login.dto';
@@ -14,17 +15,21 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'OAuth2 compatible token login' })
   @ApiResponse({ status: 200, description: 'Token response', type: TokenResponseDto })
+  @ApiResponse({ status: 400, description: 'Invalid credentials.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   login(@Body() loginDto: LoginDto): Promise<TokenResponseDto> {
     // return this.authService.login(loginDto);
-    return Promise.resolve(undefined); // Placeholder
+    return Promise.resolve(null as any); // Placeholder
   }
 
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token response', type: TokenResponseDto })
+  @ApiResponse({ status: 400, description: 'Invalid refresh token.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   refresh(@Body() refreshDto: TokenRefreshDto): Promise<TokenResponseDto> {
     // return this.authService.refresh(refreshDto);
-    return Promise.resolve(undefined); // Placeholder
+    return Promise.resolve(null as any); // Placeholder
   }
 
   @Post('logout')
@@ -35,14 +40,15 @@ export class AuthController {
     return Promise.resolve({ detail: 'Successfully logged out' });
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
   @Get('me')
   @ApiOperation({ summary: 'Get current user' })
   @ApiResponse({ status: 200, description: 'Return the current user.' })
-  me(@Req() req): Promise<any> {
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  me(@Req() req: any): Promise<any> {
     // return this.authService.getMe(req.user);
-    return Promise.resolve(undefined); // Placeholder
+    return Promise.resolve(null as any); // Placeholder
   }
 }
 
@@ -54,8 +60,9 @@ export class RegisterController {
   @Post()
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered.' })
+  @ApiResponse({ status: 400, description: 'Invalid registration data.' })
   register(@Body() registerDto: any): Promise<any> {
     // return this.authService.register(registerDto);
-    return Promise.resolve(undefined); // Placeholder
+    return Promise.resolve(null as any); // Placeholder
   }
 }

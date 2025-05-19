@@ -44,51 +44,63 @@ export class FindingsService {
     if (!finding) {
       throw new NotFoundException(`Finding with ID ${id} not found`);
     }
-    
+
     if (!finding.scan) {
-        // Data integrity issue
-        throw new NotFoundException(`Parent scan not found for finding ID ${id}`);
+      // Data integrity issue
+      throw new NotFoundException(`Parent scan not found for finding ID ${id}`);
     }
 
     // Verify user has access to the parent scan
     await this._scansService.findOne(finding.scan.id, currentUser);
-    
+
     return finding;
   }
 
   // Create is likely internal, called by ScansService or a scan worker.
   // If direct creation is needed, it must ensure scanId exists and user has access.
-  async create(scanId: string, findingData: Partial<Finding>, currentUser: CurrentUser): Promise<Finding> {
+  async create(
+    scanId: string,
+    findingData: Partial<Finding>,
+    currentUser: CurrentUser,
+  ): Promise<Finding> {
     const scan = await this._scansService.findOne(scanId, currentUser); // Check access to parent scan
 
-    const newFindingData = { 
-        ...findingData, 
-        scanId: scan.id, // Ensure scanId is set from the verified scan
-        scan: scan 
+    const newFindingData = {
+      ...findingData,
+      scanId: scan.id, // Ensure scanId is set from the verified scan
+      scan: scan,
     };
     const finding = this._findingsRepository.create(newFindingData);
     return this._findingsRepository.save(finding);
   }
 
-  async createMany(scanId: string, findingsData: Partial<Finding>[], currentUser: CurrentUser): Promise<Finding[]> {
+  async createMany(
+    scanId: string,
+    findingsData: Partial<Finding>[],
+    currentUser: CurrentUser,
+  ): Promise<Finding[]> {
     const scan = await this._scansService.findOne(scanId, currentUser); // Check access
 
     const findingsToCreate = findingsData.map(data => ({
-        ...data,
-        scanId: scan.id,
-        scan: scan,
+      ...data,
+      scanId: scan.id,
+      scan: scan,
     }));
     const findings = this._findingsRepository.create(findingsToCreate);
     return this._findingsRepository.save(findings);
   }
 
   // Update is also likely internal or highly restricted.
-  async update(id: string, findingData: Partial<Finding>, currentUser: CurrentUser): Promise<Finding> {
+  async update(
+    id: string,
+    findingData: Partial<Finding>,
+    currentUser: CurrentUser,
+  ): Promise<Finding> {
     const finding = await this.findOne(id, currentUser); // Verifies ownership via parent scan
 
     // Prevent changing the parent scan (scanId)
     if (findingData.scanId && findingData.scanId !== finding.scanId) {
-        throw new ForbiddenException('Cannot change the parent scan of a finding.');
+      throw new ForbiddenException('Cannot change the parent scan of a finding.');
     }
 
     this._findingsRepository.merge(finding, findingData);

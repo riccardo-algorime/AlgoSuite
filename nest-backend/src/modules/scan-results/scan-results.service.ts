@@ -36,13 +36,13 @@ export class ScanResultsService {
     }
 
     if (!scanResult.scan) {
-        // Data integrity issue, scan result should always have a scan
-        throw new NotFoundException(`Parent scan not found for scan result ID ${id}`);
+      // Data integrity issue, scan result should always have a scan
+      throw new NotFoundException(`Parent scan not found for scan result ID ${id}`);
     }
-    
+
     // Verify user has access to the parent scan
     await this._scansService.findOne(scanResult.scan.id, currentUser);
-    
+
     return scanResult;
   }
 
@@ -67,25 +67,33 @@ export class ScanResultsService {
 
   // Create is likely internal, called by ScansService when a scan completes.
   // If direct creation is needed, it must ensure scanId exists and user has access.
-  async create(scanId: string, scanResultData: Partial<ScanResult>, currentUser: CurrentUser): Promise<ScanResult> {
+  async create(
+    scanId: string,
+    scanResultData: Partial<ScanResult>,
+    currentUser: CurrentUser,
+  ): Promise<ScanResult> {
     const scan = await this._scansService.findOne(scanId, currentUser); // Check access to parent scan
 
-    const newScanResultData = { 
-        ...scanResultData, 
-        scanId: scan.id, // Ensure scanId is set from the verified scan
-        scan: scan 
+    const newScanResultData = {
+      ...scanResultData,
+      scanId: scan.id, // Ensure scanId is set from the verified scan
+      scan: scan,
     };
     const scanResult = this._scanResultsRepository.create(newScanResultData);
     return this._scanResultsRepository.save(scanResult);
   }
 
   // Update is also likely internal or highly restricted.
-  async update(id: string, scanResultData: Partial<ScanResult>, currentUser: CurrentUser): Promise<ScanResult> {
+  async update(
+    id: string,
+    scanResultData: Partial<ScanResult>,
+    currentUser: CurrentUser,
+  ): Promise<ScanResult> {
     const scanResult = await this.findOne(id, currentUser); // Verifies ownership via parent scan
 
-     // Prevent changing the parent scan (scanId)
+    // Prevent changing the parent scan (scanId)
     if (scanResultData.scanId && scanResultData.scanId !== scanResult.scanId) {
-        throw new ForbiddenException('Cannot change the parent scan of a scan result.');
+      throw new ForbiddenException('Cannot change the parent scan of a scan result.');
     }
 
     this._scanResultsRepository.merge(scanResult, scanResultData);

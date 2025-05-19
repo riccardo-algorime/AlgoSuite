@@ -25,10 +25,13 @@ export class ProjectsService {
 
   // For regular users to see their own projects
   findAllByUser(currentUser: CurrentUser): Promise<Project[]> {
-    const options: FindManyOptions<Project> = { where: { user: { id: currentUser.id } }, relations: ['user'] };
+    const options: FindManyOptions<Project> = {
+      where: { user: { id: currentUser.id } },
+      relations: ['user'],
+    };
     if (currentUser.isSuperuser || (currentUser.roles && currentUser.roles.includes('admin'))) {
-       // If superuser/admin, remove user filter to get all projects
-       delete options.where;
+      // If superuser/admin, remove user filter to get all projects
+      delete options.where;
     }
     return this._projectsRepository.find(options);
   }
@@ -43,7 +46,11 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
-    if (!currentUser.isSuperuser && !(currentUser.roles && currentUser.roles.includes('admin')) && project.user?.id !== currentUser.id) {
+    if (
+      !currentUser.isSuperuser &&
+      !(currentUser.roles && currentUser.roles.includes('admin')) &&
+      project.user?.id !== currentUser.id
+    ) {
       throw new ForbiddenException('You do not have permission to access this project.');
     }
 
@@ -52,7 +59,11 @@ export class ProjectsService {
 
   async create(projectData: Partial<Project>, currentUser: CurrentUser): Promise<Project> {
     // Ensure createdBy is set from currentUser, not directly from projectData if it exists
-    const projectToCreate = { ...projectData, createdBy: currentUser.id, user: currentUser as User };
+    const projectToCreate = {
+      ...projectData,
+      createdBy: currentUser.id,
+      user: currentUser as User,
+    };
     // Type assertion for 'user' might be needed if CurrentUser is simpler than User entity
     // Or fetch the User entity: const userEntity = await this.usersRepository.findOneBy({id: currentUser.id});
     // then: const projectToCreate = { ...projectData, user: userEntity };
@@ -61,12 +72,21 @@ export class ProjectsService {
     return this._projectsRepository.save(project);
   }
 
-  async update(id: string, projectData: Partial<Project>, currentUser: CurrentUser): Promise<Project> {
+  async update(
+    id: string,
+    projectData: Partial<Project>,
+    currentUser: CurrentUser,
+  ): Promise<Project> {
     const project = await this.findOne(id, currentUser); // findOne now includes ownership check
 
     // Prevent changing the owner unless by specific logic (e.g. admin transfer)
-    if (projectData.createdBy && projectData.createdBy !== project.createdBy && !currentUser.isSuperuser && !(currentUser.roles && currentUser.roles.includes('admin'))) {
-        throw new ForbiddenException('You cannot change the project owner.');
+    if (
+      projectData.createdBy &&
+      projectData.createdBy !== project.createdBy &&
+      !currentUser.isSuperuser &&
+      !(currentUser.roles && currentUser.roles.includes('admin'))
+    ) {
+      throw new ForbiddenException('You cannot change the project owner.');
     }
     // If projectData contains 'user' object, handle similarly
 

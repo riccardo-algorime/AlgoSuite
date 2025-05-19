@@ -25,7 +25,10 @@ export class AssetsService {
   //   return this._assetsRepository.find({ relations: ['attackSurface'] });
   // }
 
-  async findAllByAttackSurface(attackSurfaceId: string, currentUser: CurrentUser): Promise<Asset[]> {
+  async findAllByAttackSurface(
+    attackSurfaceId: string,
+    currentUser: CurrentUser,
+  ): Promise<Asset[]> {
     // First, verify user has access to the parent attack surface
     await this._attackSurfacesService.findOne(attackSurfaceId, currentUser);
     // findOne in AttackSurfacesService already throws ForbiddenException if no access
@@ -53,14 +56,14 @@ export class AssetsService {
       // This case should ideally not happen
       throw new NotFoundException(`Parent attack surface not found for asset ${id}`);
     }
-    
+
     return asset;
   }
 
   async create(
     attackSurfaceId: string,
     assetData: Partial<Asset>,
-    currentUser: CurrentUser
+    currentUser: CurrentUser,
   ): Promise<Asset> {
     // Verify user has access to the parent attack surface
     const attackSurface = await this._attackSurfacesService.findOne(attackSurfaceId, currentUser);
@@ -75,16 +78,12 @@ export class AssetsService {
     return this._assetsRepository.save(asset);
   }
 
-  async update(
-    id: string,
-    assetData: Partial<Asset>,
-    currentUser: CurrentUser
-  ): Promise<Asset> {
+  async update(id: string, assetData: Partial<Asset>, currentUser: CurrentUser): Promise<Asset> {
     const asset = await this.findOne(id, currentUser); // This already checks parent ownership
 
     // Prevent changing the parent attack surface (attackSurfaceId) unless specific logic allows it
     if (assetData.attackSurfaceId && assetData.attackSurfaceId !== asset.attackSurfaceId) {
-       if (!currentUser.isSuperuser && !(currentUser.roles && currentUser.roles.includes('admin'))) {
+      if (!currentUser.isSuperuser && !(currentUser.roles && currentUser.roles.includes('admin'))) {
         throw new ForbiddenException('You cannot change the parent attack surface of an asset.');
       }
       // If allowing change, re-verify access to the new parent attack surface
