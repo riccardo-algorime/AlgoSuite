@@ -17,10 +17,7 @@ describe('AssetsService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AssetsService,
-        { provide: getRepositoryToken(Asset), useValue: mockRepo },
-      ],
+      providers: [AssetsService, { provide: getRepositoryToken(Asset), useValue: mockRepo }],
     }).compile();
 
     service = module.get<AssetsService>(AssetsService);

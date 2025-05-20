@@ -1,31 +1,16 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AttackSurfacesService } from './attack-surfaces.service';
-import {
-  CreateAttackSurfaceDto,
-  UpdateAttackSurfaceDto,
-  AttackSurfaceResponseDto,
-  AttackSurfaceWithAssetsDto,
-} from './dto';
-import { plainToInstance } from 'class-transformer';
- // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
- // import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
+import { AttackSurfaceResponseDto, AttackSurfaceWithAssetsDto } from './dto';
+// import { plainToInstance } from 'class-transformer';
+// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+// import { CurrentUser } from '../auth/decorators/current-user.decorator';
+// import { User } from '../users/entities/user.entity';
 
 @ApiTags('attack-surfaces')
 @ApiBearerAuth()
 @Controller('projects/:projectId/attack-surfaces')
- // @UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class AttackSurfacesController {
   constructor(private readonly _attackSurfacesService: AttackSurfacesService) {}
 
@@ -41,7 +26,7 @@ export class AttackSurfacesController {
   @ApiResponse({ status: 404, description: 'Project not found.' })
   async create(
     @Param('projectId') projectId: string,
-    @Body() createAttackSurfaceDto: CreateAttackSurfaceDto,
+    // @Body() createAttackSurfaceDto: CreateAttackSurfaceDto,
     // @CurrentUser() user: User
   ): Promise<AttackSurfaceResponseDto> {
     // const attackSurface = await this._attackSurfacesService.create(
@@ -76,8 +61,8 @@ export class AttackSurfacesController {
   async findAll(
     @Param('projectId') projectId: string,
     // @CurrentUser() user: User
-    @Query('skip') skip?: number,
-    @Query('limit') limit?: number
+    // @Query('skip') skip?: number,
+    // @Query('limit') limit?: number,
   ): Promise<AttackSurfaceResponseDto[]> {
     // const attackSurfaces = await this._attackSurfacesService.findAllByProject(
     //   projectId,
@@ -124,7 +109,7 @@ export class AttackSurfacesController {
   async update(
     @Param('projectId') projectId: string,
     @Param('id') id: string,
-    @Body() updateAttackSurfaceDto: UpdateAttackSurfaceDto,
+    // @Body() updateAttackSurfaceDto: UpdateAttackSurfaceDto,
     // @CurrentUser() user: User
   ): Promise<AttackSurfaceResponseDto> {
     // const attackSurface = await this._attackSurfacesService.findOne(id, user);

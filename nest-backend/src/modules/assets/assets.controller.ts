@@ -1,26 +1,16 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AssetsService } from './assets.service';
-import { CreateAssetDto, UpdateAssetDto, AssetResponseDto } from './dto';
-import { plainToInstance } from 'class-transformer';
- // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
- // import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
+import { AssetResponseDto } from './dto';
+// import { plainToInstance } from 'class-transformer';
+// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+// import { CurrentUser } from '../auth/decorators/current-user.decorator';
+// import { User } from '../users/entities/user.entity';
 
 @ApiTags('assets')
 @ApiBearerAuth()
 @Controller('projects/:projectId/attack-surfaces/:attackSurfaceId/assets')
- // @UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class AssetsController {
   constructor(private readonly _assetsService: AssetsService) {}
 
@@ -37,7 +27,7 @@ export class AssetsController {
   async create(
     @Param('projectId') projectId: string,
     @Param('attackSurfaceId') attackSurfaceId: string,
-    @Body() createAssetDto: CreateAssetDto,
+    // @Body() createAssetDto: CreateAssetDto,
     // @CurrentUser() user: User
   ): Promise<AssetResponseDto> {
     // const asset = await this._assetsService.create(
@@ -73,8 +63,8 @@ export class AssetsController {
     @Param('projectId') projectId: string,
     @Param('attackSurfaceId') attackSurfaceId: string,
     // @CurrentUser() user: User
-    @Query('skip') skip?: number,
-    @Query('limit') limit?: number
+    // @Query('skip') skip?: number,
+    // @Query('limit') limit?: number,
   ): Promise<AssetResponseDto[]> {
     // const assets = await this._assetsService.findAllByAttackSurface(
     //   attackSurfaceId,
@@ -123,7 +113,7 @@ export class AssetsController {
     @Param('projectId') projectId: string,
     @Param('attackSurfaceId') attackSurfaceId: string,
     @Param('id') id: string,
-    @Body() updateAssetDto: UpdateAssetDto,
+    // @Body() updateAssetDto: UpdateAssetDto,
     // @CurrentUser() user: User
   ): Promise<AssetResponseDto> {
     // const asset = await this._assetsService.findOne(id, user);

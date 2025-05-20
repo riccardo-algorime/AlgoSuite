@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AttackSurface } from './entities/attack-surface.entity';
 import { ProjectsService } from '../projects/projects.service'; // To check project ownership
-import { User } from '../users/entities/user.entity'; // For CurrentUser type
+// import { User } from '../users/entities/user.entity'; // For CurrentUser type
 
 // Define a simplified User type for currentUser parameter
 interface CurrentUser {

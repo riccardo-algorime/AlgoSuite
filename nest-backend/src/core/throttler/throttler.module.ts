@@ -7,7 +7,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       {
         ttl: 60, // time to live in seconds
         limit: 10, // max requests per ttl per user
-      }
+      },
     ]),
   ],
   exports: [ThrottlerModule],

@@ -1,26 +1,16 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { ScansService } from './scans.service';
-import { CreateScanDto, UpdateScanDto, ScanResponseDto } from './dto';
-import { plainToInstance } from 'class-transformer';
- // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
- // import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
+import { ScanResponseDto } from './dto';
+// import { plainToInstance } from 'class-transformer';
+// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+// import { CurrentUser } from '../auth/decorators/current-user.decorator';
+// import { User } from '../users/entities/user.entity';
 
 @ApiTags('scans')
 @ApiBearerAuth()
 @Controller('scans')
- // @UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class ScansController {
   constructor(private readonly _scansService: ScansService) {}
 
@@ -33,10 +23,9 @@ export class ScansController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async create(
-    @Body() createScanDto: CreateScanDto,
-    // @CurrentUser() user: User
-  ): Promise<ScanResponseDto> {
+  async create() // @Body() createScanDto: CreateScanDto,
+  // @CurrentUser() user: User
+  : Promise<ScanResponseDto> {
     // const scan = await this._scansService.create(
     //   createScanDto,
     //   user
@@ -65,11 +54,10 @@ export class ScansController {
     type: Number,
     description: 'Number of records to return',
   })
-  async findAll(
-    // @CurrentUser() user: User
-    @Query('skip') skip?: number,
-    @Query('limit') limit?: number
-  ): Promise<ScanResponseDto[]> {
+  async findAll() // @CurrentUser() user: User
+  // @Query('skip') skip?: number,
+  // @Query('limit') limit?: number,
+  : Promise<ScanResponseDto[]> {
     // const scans = await this._scansService.findAllByUser(user);
     // return scans.map(scan => plainToInstance(ScanResponseDto, scan));
     throw new Error('Auth not implemented: uncomment and implement when ready.');
@@ -105,7 +93,7 @@ export class ScansController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async update(
     @Param('id') id: string,
-    @Body() updateScanDto: UpdateScanDto,
+    // @Body() updateScanDto: UpdateScanDto,
     // @CurrentUser() user: User
   ): Promise<ScanResponseDto> {
     // const scan = await this._scansService.update(id, updateScanDto, user);

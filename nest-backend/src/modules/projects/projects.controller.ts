@@ -1,24 +1,14 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
-import { CreateProjectDto, UpdateProjectDto, ProjectResponseDto } from './dto';
-import { Project } from './entities/project.entity';
-import { plainToInstance } from 'class-transformer';
-import { User } from '../users/entities/user.entity';
+import { ProjectResponseDto } from './dto';
+// import { Project } from './entities/project.entity';
+// import { plainToInstance } from 'class-transformer';
+// import { User } from '../users/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from '../auth/roles.enum';
+// import { Roles } from '../auth/roles.decorator';
+// import { Role } from '../auth/roles.enum';
 
 @ApiTags('projects')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -36,10 +26,9 @@ export class ProjectsController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  async create(
-    @Body() createProjectDto: CreateProjectDto,
-    // @CurrentUser() user: User
-  ): Promise<ProjectResponseDto> {
+  async create() // @Body() createProjectDto: CreateProjectDto,
+  // @CurrentUser() user: User
+  : Promise<ProjectResponseDto> {
     // const project = await this._projectsService.create(
     //   createProjectDto,
     //   user
@@ -68,11 +57,10 @@ export class ProjectsController {
     type: Number,
     description: 'Number of records to return',
   })
-  async findAll(
-    // @CurrentUser() user: User
-    @Query('skip') skip?: number,
-    @Query('limit') limit?: number
-  ): Promise<ProjectResponseDto[]> {
+  async findAll() // @CurrentUser() user: User
+  // @Query('skip') skip?: number,
+  // @Query('limit') limit?: number,
+  : Promise<ProjectResponseDto[]> {
     // const projects = await this._projectsService.findAllByUser(user);
     // return projects.map(project => plainToInstance(ProjectResponseDto, project));
     throw new Error('Auth not implemented: uncomment and implement when ready.');
@@ -108,7 +96,7 @@ export class ProjectsController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async update(
     @Param('id') id: string,
-    @Body() updateProjectDto: UpdateProjectDto,
+    // @Body() updateProjectDto: UpdateProjectDto,
     // @CurrentUser() user: User
   ): Promise<ProjectResponseDto> {
     // const project = await this._projectsService.update(id, updateProjectDto, user);

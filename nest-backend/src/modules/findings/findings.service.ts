@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Finding } from './entities/finding.entity';
 import { ScansService } from '../scans/scans.service'; // To check parent scan ownership
-import { User } from '../users/entities/user.entity'; // For CurrentUser type
+// import { User } from '../users/entities/user.entity'; // For CurrentUser type
 
 // Define a simplified User type for currentUser parameter
 interface CurrentUser {

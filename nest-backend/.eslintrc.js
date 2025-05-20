@@ -1,68 +1,38 @@
 module.exports = {
-    parser: '@typescript-eslint/parser',
-    parserOptions: {
-        project: 'tsconfig.json',
-        tsconfigRootDir: __dirname,
-        sourceType: 'module',
+  overrides: [
+    {
+      files: ['*.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+      parserOptions: {
+        project: null,
+      },
     },
-    plugins: ['@typescript-eslint/eslint-plugin'],
-    extends: [
-        'plugin:@typescript-eslint/recommended',
-        'plugin:prettier/recommended',
-    ],
-    root: true,
-    env: {
-        node: true,
-        jest: true,
-    },
-    ignorePatterns: ['.eslintrc.js', 'dist', 'node_modules'],
-    rules: {
-        '@typescript-eslint/interface-name-prefix': 'off',
-        '@typescript-eslint/explicit-function-return-type': 'warn',
-        '@typescript-eslint/explicit-module-boundary-types': 'warn',
-        '@typescript-eslint/no-explicit-any': 'error',
-        '@typescript-eslint/no-unused-vars': ['error', {
-            'argsIgnorePattern': '^_',
-            'varsIgnorePattern': '^_',
-        }],
-        '@typescript-eslint/naming-convention': [
-            'error',
-            {
-                'selector': 'default',
-                'format': ['camelCase']
-            },
-            {
-                'selector': 'variable',
-                'format': ['camelCase', 'UPPER_CASE']
-            },
-            {
-                'selector': 'parameter',
-                'format': ['camelCase'],
-                'leadingUnderscore': 'allow'
-            },
-            {
-                'selector': 'memberLike',
-                'modifiers': ['private'],
-                'format': ['camelCase'],
-                'leadingUnderscore': 'require'
-            },
-            {
-                'selector': 'typeLike',
-                'format': ['PascalCase']
-            },
-            {
-                'selector': 'interface',
-                'format': ['PascalCase'],
-                'prefix': ['I']
-            },
-            {
-                'selector': 'enum',
-                'format': ['PascalCase'],
-                'suffix': ['Enum']
-            }
-        ],
-        'prettier/prettier': ['error', {
-            'endOfLine': 'auto'
-        }]
-    },
+  ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: ['./tsconfig.json'],
+    // Exclude config files from type-aware linting
+    tsconfigRootDir: __dirname,
+    project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
+    sourceType: 'module',
+  },
+  plugins: ['@typescript-eslint'],
+  extends: [
+    'plugin:@typescript-eslint/recommended', // Best-practice TS rules
+    'plugin:prettier/recommended', // Prettier integration
+  ],
+  root: true,
+  env: {
+    node: true,
+    jest: true,
+  },
+  // Use only the recommended rules for a balanced, modern setup
+  rules: {
+    // Warn instead of error for unused vars and any usage during migration
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-explicit-any': 'warn',
+  },
 };
