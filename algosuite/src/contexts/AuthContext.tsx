@@ -231,7 +231,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log('Registering user:', { email, fullName });
 
       // Call the backend API to register the user
-      const response = await api.post('/v1/register', {
+      const response = await api.post('/v1/auth/register', {
         email,
         full_name: fullName,
         password

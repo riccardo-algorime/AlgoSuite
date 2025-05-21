@@ -1,4 +1,5 @@
 import { Body, Controller, HttpCode, Post, Query } from '@nestjs/common';
+import { Public } from '../../common/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -9,6 +10,7 @@ import { RegisterDto } from './dto/register.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('login')
   @HttpCode(200)
   @ApiOperation({ summary: 'Login user' })
@@ -18,6 +20,7 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Public()
   @Post('register')
   @ApiOperation({ summary: 'Register new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
@@ -26,6 +29,7 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
+  @Public()
   @Post('refresh')
   @HttpCode(200)
   @ApiOperation({ summary: 'Refresh access token' })

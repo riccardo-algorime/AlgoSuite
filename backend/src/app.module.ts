@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, Reflector } from '@nestjs/core';
 import { getDatabaseConfig } from './config/database.config';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -31,7 +31,8 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useFactory: (reflector: Reflector) => new JwtAuthGuard(reflector),
+      inject: [Reflector],
     },
     {
       provide: APP_GUARD,
