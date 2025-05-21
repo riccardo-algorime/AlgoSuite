@@ -6,11 +6,13 @@ import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagg
 import { LoginDto } from './dto/login.dto';
 import { TokenRefreshDto } from './dto/token-refresh.dto';
 import { TokenResponseDto } from './dto/token-response.dto';
+import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  // constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   @ApiOperation({ summary: 'OAuth2 compatible token login' })
@@ -18,8 +20,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid credentials.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   login(@Body() loginDto: LoginDto): Promise<TokenResponseDto> {
-    // return this.authService.login(loginDto);
-    return Promise.resolve(null as any); // Placeholder
+    return this.authService.login(loginDto);
   }
 
   @Post('refresh')
@@ -28,16 +29,14 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid refresh token.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   refresh(@Body() refreshDto: TokenRefreshDto): Promise<TokenResponseDto> {
-    // return this.authService.refresh(refreshDto);
-    return Promise.resolve(null as any); // Placeholder
+    return this.authService.refresh(refreshDto);
   }
 
   @Post('logout')
   @ApiOperation({ summary: 'Logout user (client-side only)' })
   @ApiResponse({ status: 200, description: 'Successfully logged out' })
   logout(): Promise<{ detail: string }> {
-    // return this.authService.logout();
-    return Promise.resolve({ detail: 'Successfully logged out' });
+    return this.authService.logout();
   }
 
   @Get('me')
@@ -47,22 +46,24 @@ export class AuthController {
   @ApiBearerAuth()
   // @UseGuards(JwtAuthGuard)
   me(@Req() req: any): Promise<any> {
-    // return this.authService.getMe(req.user);
-    return Promise.resolve(null as any); // Placeholder
+    // TODO: Use CurrentUser decorator and define user type. req.user should be populated by a guard.
+    return this.authService.getMe(req.user);
+    // return Promise.resolve(null as any); // Placeholder
   }
 }
 
 @ApiTags('register')
 @Controller('register')
 export class RegisterController {
-  // constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post()
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered.' })
   @ApiResponse({ status: 400, description: 'Invalid registration data.' })
-  register(@Body() registerDto: any): Promise<any> {
-    // return this.authService.register(registerDto);
-    return Promise.resolve(null as any); // Placeholder
+  register(@Body() registerDto: RegisterDto): Promise<any> {
+    // Changed to RegisterDto
+    return this.authService.register(registerDto);
+    // return Promise.resolve(null as any); // Placeholder
   }
 }

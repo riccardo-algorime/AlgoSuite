@@ -14,7 +14,10 @@ export class DatabaseService implements OnModuleInit {
         this._logger.log('Database connection initialized successfully');
       }
     } catch (error) {
-      this._logger.error('Error during database connection initialization', error.stack);
+      this._logger.error(
+        'Error during database connection initialization',
+        error instanceof Error ? error.stack : String(error),
+      );
       throw error;
     }
   }
@@ -35,7 +38,10 @@ export class DatabaseService implements OnModuleInit {
       await queryRunner.commitTransaction();
       return result;
     } catch (error) {
-      this._logger.error('Transaction failed, rolling back', error.stack);
+      this._logger.error(
+        'Transaction failed, rolling back',
+        error instanceof Error ? error.stack : String(error),
+      );
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
@@ -64,7 +70,10 @@ export class DatabaseService implements OnModuleInit {
       }
       return true;
     } catch (error) {
-      this._logger.error('Database reconnection failed', error.stack);
+      this._logger.error(
+        'Database reconnection failed',
+        error instanceof Error ? error.stack : String(error),
+      );
       return false;
     }
   }
@@ -79,7 +88,10 @@ export class DatabaseService implements OnModuleInit {
         this._logger.log('Database connection closed');
       }
     } catch (error) {
-      this._logger.error('Error closing database connection', error.stack);
+      this._logger.error(
+        'Error closing database connection',
+        error instanceof Error ? error.stack : String(error),
+      );
       throw error;
     }
   }

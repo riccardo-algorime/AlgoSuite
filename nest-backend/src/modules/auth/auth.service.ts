@@ -7,6 +7,8 @@ import { User } from '../users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayloadDto } from './dto/token-payload.dto';
 import { TokenResponseDto } from './dto/token-response.dto';
+import { RegisterDto } from './dto/register.dto';
+import { TokenRefreshDto } from './dto/token-refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -57,6 +59,76 @@ export class AuthService {
       // refreshToken, // Uncomment if refresh tokens are implemented
       user: userValidationResult, // Return the validated user object (without password)
     };
+  }
+
+  async register(registerDto: RegisterDto): Promise<TokenResponseDto> {
+    const { email, password, firstName, lastName } = registerDto;
+    // Check if user already exists
+    const existingUser = await this.usersService.findByEmail(email);
+    if (existingUser) {
+      this.logger.warn(`Registration attempt for existing email: ${email}`);
+      throw new UnauthorizedException('User with this email already exists');
+    }
+
+    // Create new user
+    const newUser = await this.usersService.create({
+      email,
+      password, // UsersService.create should handle hashing
+      firstName,
+      lastName,
+      roles: ['user'], // Default role
+    });
+
+    // Log in the new user
+    return this.login({ email: newUser.email, password }); // Use original password for login before it's hashed and discarded
+  }
+
+  async refresh(refreshDto: TokenRefreshDto): Promise<TokenResponseDto> {
+    // This is a placeholder. A full refresh token strategy needs to be implemented.
+    // It would typically involve validating the refresh token, checking it against a store,
+    // and issuing new access (and possibly refresh) tokens.
+    this.logger.warn(
+      `Refresh token functionality not fully implemented. Received: ${refreshDto.refreshToken}`,
+    );
+    // For now, let's assume the refresh token itself contains enough info to re-issue an access token
+    // Or, it could be that the refresh token is just a long-lived access token.
+    // This is highly dependent on the chosen JWT strategy.
+    // Let's throw an error to indicate it's not ready for use.
+    throw new UnauthorizedException('Refresh token functionality is not yet implemented.');
+    // Example of re-signing if the refresh token was just a JWT with user payload:
+    // const payload = await this.verifyToken(refreshDto.refreshToken); // Assuming verifyToken can handle refresh tokens
+    // const user = await this.usersService.findById(payload.sub);
+    // if (!user) {
+    //   throw new UnauthorizedException('Invalid refresh token user not found');
+    // }
+    // const newAccessToken = this.jwtService.sign({ email: user.email, sub: user.id, roles: user.roles || [] }, {
+    //   secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+    //   expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRATION_TIME'),
+    // });
+    // return {
+    //   accessToken: newAccessToken,
+    //   user: { id: user.id, email: user.email, roles: user.roles, firstName: user.firstName, lastName: user.lastName } // Adjust user fields as needed
+    // };
+  }
+
+  async logout(): Promise<{ detail: string }> {
+    // For JWT, logout is typically handled client-side by deleting the token.
+    // If using a token blacklist or server-side sessions, implement invalidation here.
+    this.logger.log('Logout requested. Client should clear token.');
+    return { detail: 'Successfully logged out. Please clear your token.' };
+  }
+
+  async getMe(userPayload: TokenPayloadDto): Promise<Omit<User, 'hashedPassword'> | null> {
+    if (!userPayload || !userPayload.sub) {
+      throw new UnauthorizedException('Invalid user payload for getMe');
+    }
+    const user = await this.usersService.findOne(userPayload.sub);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hashedPassword, ...result } = user;
+    return result;
   }
 
   async getPasswordHash(password: string): Promise<string> {
