@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -8,6 +8,8 @@ import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -74,6 +76,18 @@ export class AuthService {
       };
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async logout(userId: string) {
+    try {
+      this.logger.log(`Logging out user with ID: ${userId}`);
+      // Clear the refresh token in the database
+      await this.usersService.setRefreshToken(userId, null);
+      return { success: true, message: 'Logged out successfully' };
+    } catch (error) {
+      this.logger.error(`Error during logout: ${error.message}`);
+      throw error;
     }
   }
 

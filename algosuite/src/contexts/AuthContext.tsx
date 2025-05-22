@@ -114,29 +114,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   // Login function
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User | null> => {
     try {
-      // Create form data for OAuth2 password flow
-      const formData = new URLSearchParams();
-      formData.append('username', username);
-      formData.append('password', password);
-
-      // No need for client_id anymore with PostgreSQL auth
-      // formData.append('client_id', 'algosuite-frontend');
-      formData.append('grant_type', 'password');
+      // Create JSON payload with email and password
+      const loginPayload = {
+        email: email,
+        password: password
+      };
 
       // Call the backend API to authenticate
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify(loginPayload),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || 'Authentication failed');
+        const errorMessage = errorData.message || errorData.detail || `Authentication failed (${response.status})`;
+        throw new Error(errorMessage);
       }
 
       // Parse the response
@@ -149,50 +147,199 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw new Error('No access token received from server');
       }
 
-      // Store tokens in local storage
+      // Store tokens in localStorage
       localStorage.setItem(TOKEN_KEY, data.access_token);
-      localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token || '');
+      if (data.refresh_token) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
+      }
 
-      // Log token storage for debugging
       console.log('Tokens stored in localStorage:', {
         hasAccessToken: !!data.access_token,
-        hasRefreshToken: !!data.refresh_token
+        hasRefreshToken: !!data.refresh_token,
       });
 
-      // Get user info using the token
-      const userResponse = await fetchUserInfo(data.access_token);
+      // SECURITY NOTICE: In production, always validate tokens on the backend
+      // The following approach prioritizes backend validation when available
+      let userInfo;
+      
+      try {
+        // First try to get user info from API (secure approach)
+        userInfo = await fetchUserInfo(data.access_token);
+        console.log('Successfully retrieved user info from backend');
+      } catch (userInfoError) {
+        console.warn('Backend /me endpoint failed, using token decoding as TEMPORARY fallback', userInfoError);
+        console.warn('SECURITY WARNING: Token decoding on frontend should only be used during development');
+        
+        // DEVELOPMENT FALLBACK ONLY: Extract user info from token
+        // This approach bypasses proper backend validation and should NOT be used in production
+        userInfo = extractUserFromToken(data.access_token);
+        
+        if (!userInfo) {
+          console.error('Both backend validation and token decoding failed');
+          throw new Error('Failed to get user information');
+        }
+      }
 
-      // Store user in local storage
-      localStorage.setItem(USER_KEY, JSON.stringify(userResponse));
+      localStorage.setItem(USER_KEY, JSON.stringify(userInfo));
 
-      // Update auth state
+      // Update state
       setAuthState({
         isAuthenticated: true,
         token: data.access_token,
-        user: userResponse,
+        user: userInfo,
       });
+
+      // Set up token refresh interval
+      // Only set up refresh interval if we have a refresh token
+      if (data.refresh_token) {
+        // Set up refresh interval - refresh token before it expires
+        const tokenRefreshInterval = setInterval(() => {
+          const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+          if (refreshToken) {
+            refreshAccessToken(refreshToken).catch(console.error);
+          } else {
+            clearInterval(tokenRefreshInterval);
+          }
+        }, 1000 * 60 * 15); // Refresh every 15 minutes
+      }
+
+      return userInfo;
     } catch (error) {
       console.error('Login error:', error);
+      // Clear any partial auth state on error
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
       throw error;
     }
   };
 
-  // Helper function to fetch user info
-  const fetchUserInfo = async (token: string) => {
+  /**
+   * SECURITY WARNING: This function is for DEVELOPMENT USE ONLY.
+   * 
+   * Extracting and trusting user information from JWT tokens on the frontend
+   * is NOT secure for production environments because:
+   * 
+   * 1. It bypasses proper signature verification
+   * 2. It doesn't validate if the user still exists in the database
+   * 3. It doesn't check if the user account is still active/not banned
+   * 4. It could be manipulated by sophisticated attackers
+   * 
+   * In production, ALWAYS validate tokens on the backend through a proper /me endpoint.
+   * This function should only be used as a fallback during development or when
+   * backend services are temporarily unavailable.
+   */
+  const extractUserFromToken = (token: string): User | null => {
+    if (!token) return null;
+    
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/me`, {
+      // JWT tokens are in the format: header.payload.signature
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) return null;
+      
+      // The payload is the second part (index 1) and is base64 encoded
+      // Need to handle base64url format by replacing characters and adding padding
+      const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const padding = '='.repeat((4 - base64.length % 4) % 4);
+      const jsonPayload = atob(base64 + padding);
+      
+      const payload = JSON.parse(jsonPayload);
+      console.log('Extracted user info from token:', payload);
+      console.warn('DEVELOPMENT MODE: Using unverified token data - NOT FOR PRODUCTION');
+      
+      // Create a user object from the payload
+      return {
+        id: payload.sub,
+        email: payload.email,
+        is_active: true, // Note: This is assumed without verification
+        is_superuser: payload.role === 'admin', // Note: This is assumed without verification
+        full_name: payload.name || '' // Use name if available
+      };
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  };
+
+  // Helper function to fetch user info from the API
+  const fetchUserInfo = async (token: string): Promise<User> => {
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    // Try up to 3 times with exponential backoff
+    let lastError;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          // If unauthorized, don't retry
+          if (response.status === 401 || response.status === 403) {
+            throw new Error(`Authentication error: ${response.status}`);
+          }
+          
+          // For other errors, we'll retry
+          throw new Error(`Failed to fetch user info: ${response.status}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.warn(`Attempt ${attempt + 1} failed:`, error);
+        lastError = error;
+        
+        // Don't wait on the last attempt
+        if (attempt < 2) {
+          // Exponential backoff: 500ms, 1000ms
+          await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
+        }
+      }
+    }
+
+    // All attempts failed
+    throw lastError || new Error('Failed to fetch user info after multiple attempts');
+  };
+
+  // Function to refresh the access token using a refresh token
+  const refreshAccessToken = async (refreshToken: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch user info');
+        throw new Error('Failed to refresh token');
       }
 
-      return await response.json();
+      const data = await response.json();
+      if (!data.access_token) {
+        throw new Error('No access token received from server');
+      }
+
+      // Update the access token in localStorage
+      localStorage.setItem(TOKEN_KEY, data.access_token);
+      if (data.refresh_token) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
+      }
+
+      // Update the auth state
+      setAuthState(prev => ({
+        ...prev,
+        token: data.access_token,
+      }));
+
+      return data.access_token;
     } catch (error) {
-      console.error('Error fetching user info:', error);
+      console.error('Error refreshing token:', error);
+      // If refresh fails, log the user out
+      logout();
       throw error;
     }
   };

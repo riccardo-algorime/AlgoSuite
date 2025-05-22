@@ -16,7 +16,7 @@ import { NavLink as Link } from '../components/ui/link';
 import { Field } from '@chakra-ui/react';
 
 export const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -47,8 +47,15 @@ export const LoginPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!username || !password) {
-      setError('Username and password are required');
+    if (!email || !password) {
+      setError('Email and password are required');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -56,7 +63,7 @@ export const LoginPage = () => {
     setError(null);
 
     try {
-      await login(username, password);
+      await login(email, password);
       // Redirect to the page the user was trying to access
       navigate(from, { replace: true });
     } catch (err) {
@@ -92,14 +99,14 @@ export const LoginPage = () => {
             <form onSubmit={handleSubmit}>
               <VStack spacing={4}>
                 <Field.Root required>
-                  <Field.Label htmlFor="username">Username</Field.Label>
+                  <Field.Label htmlFor="email">Email</Field.Label>
                   <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
-                    placeholder="Enter your username"
+                    placeholder="Enter your email"
                   />
                 </Field.Root>
 

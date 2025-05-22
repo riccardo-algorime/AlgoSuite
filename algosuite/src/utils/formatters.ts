@@ -1,11 +1,21 @@
 /**
  * Format a date string to a more readable format
- * @param dateString ISO date string
+ * @param dateString ISO date string or Date object
  * @returns Formatted date string
  */
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string | Date | null | undefined): string {
+  if (!dateString) {
+    return '-';
+  }
+
   try {
-    const date = new Date(dateString);
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return '-';
+    }
+
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
@@ -15,7 +25,7 @@ export function formatDate(dateString: string): string {
     }).format(date);
   } catch (error) {
     console.error('Error formatting date:', error);
-    return dateString;
+    return '-';
   }
 }
 

@@ -5,9 +5,16 @@ export interface Project {
   id: string;
   name: string;
   description: string | null;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
+  owner?: {
+    id: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  // Keep the old property names for backward compatibility
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Project creation payload

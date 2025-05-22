@@ -25,8 +25,24 @@ export class UsersService {
     return user === null ? undefined : user;
   }
 
-  async setRefreshToken(userId: string, refreshToken: string): Promise<void> {
-    await this.usersRepository.update(userId, { refreshToken });
+  async setRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
+    // Handle null case explicitly for TypeORM
+    if (refreshToken === null) {
+      await this.usersRepository.update(userId, { refreshToken: undefined });
+    } else {
+      await this.usersRepository.update(userId, { refreshToken });
+    }
+  }
+
+  async findById(id: string): Promise<User | undefined> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    return user === null ? undefined : user;
+  }
+
+  async update(id: string, data: Partial<User>): Promise<void> {
+    // Filter out complex objects that TypeORM can't handle directly
+    const { projects, ...updateData } = data as any;
+    await this.usersRepository.update(id, updateData);
   }
 }
 

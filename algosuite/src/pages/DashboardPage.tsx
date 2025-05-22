@@ -130,8 +130,8 @@ export const DashboardPage = () => {
                   <Table.Row key={project.id}>
                     <Table.Cell fontWeight="medium">{project.name}</Table.Cell>
                     <Table.Cell>{project.description || '-'}</Table.Cell>
-                    <Table.Cell>{formatDate(project.created_at)}</Table.Cell>
-                    <Table.Cell>{formatDate(project.updated_at)}</Table.Cell>
+                    <Table.Cell>{formatDate(project.createdAt)}</Table.Cell>
+                    <Table.Cell>{formatDate(project.updatedAt)}</Table.Cell>
                     <Table.Cell textAlign="right">
                       <Button size="sm" variant="ghost" onClick={() => handleViewProject(project)} mr={2}>
                         View

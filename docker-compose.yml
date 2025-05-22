@@ -31,6 +31,8 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    command: >
+      sh -c "npm run start:dev"
     environment:
       - DATABASE_URL=postgresql+psycopg2://postgres:${DB_PASSWORD:-postgres}@db:5432/algosuite
       - REDIS_HOST=redis

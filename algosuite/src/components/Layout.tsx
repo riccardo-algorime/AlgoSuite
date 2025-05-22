@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Box,
   Button,
@@ -18,6 +18,7 @@ import {
   DocsIcon,
   SettingsIcon
 } from './icons/NavIcons'
+import { useAuth } from '../hooks/useAuth'
 
 interface LayoutProps {
   children: ReactNode
@@ -25,10 +26,22 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { authState, logout } = useAuth()
 
   // Check if a path is active
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`)
+  }
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   // Define navigation item type
@@ -132,6 +145,20 @@ export const Layout = ({ children }: LayoutProps) => {
               >
                 <SettingsIcon boxSize={5} />
               </Button>
+
+              {/* Logout Button */}
+              {authState.isAuthenticated && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  color="white"
+                  borderColor="gray.600"
+                  _hover={{ bg: 'gray.800' }}
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              )}
             </HStack>
           </Flex>
         </Container>

@@ -33,7 +33,7 @@ interface TokenResponse {
 // Auth context type
 interface AuthContextType {
   authState: AuthState;
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User | null>;
   register: (email: string, fullName: string, password: string) => Promise<RegisterResponse>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<TokenResponse>;
@@ -46,7 +46,7 @@ export const AuthContext = createContext<AuthContextType>({
     token: null,
     user: null,
   },
-  login: async () => {},
+  login: async () => null,
   register: async () => {
     return {
       success: false,
