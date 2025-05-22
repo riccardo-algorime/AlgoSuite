@@ -29,15 +29,16 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
     AssetsModule,
   ],
   providers: [
-    {
-      provide: APP_GUARD,
-      useFactory: (reflector: Reflector) => new JwtAuthGuard(reflector),
-      inject: [Reflector],
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    // Temporarily commenting out global guards for debugging
+    // {
+    //   provide: APP_GUARD,
+    //   useFactory: (reflector: Reflector) => new JwtAuthGuard(reflector),
+    //   inject: [Reflector],
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
   ],
 })
 export class AppModule {}

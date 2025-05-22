@@ -230,12 +230,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       console.log('Registering user:', { email, fullName });
 
-      // Call the backend API to register the user
-      const response = await api.post('/v1/auth/register', {
+      // Split fullName into firstName and lastName
+      const nameParts = fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+      // Prepare registration data - IMPORTANT: Use firstName and lastName, NOT full_name
+      const registrationData = {
         email,
-        full_name: fullName,
+        firstName, // Backend expects firstName (not full_name)
+        lastName,  // Backend expects lastName
         password
-      });
+      };
+
+      // Log the exact data being sent to the backend
+      console.log('Sending registration data to backend:', JSON.stringify(registrationData));
+
+      // Call the backend API to register the user with the correct DTO format
+      const response = await api.post('/v1/auth/register', registrationData);
 
       console.log('Registration successful:', response);
 

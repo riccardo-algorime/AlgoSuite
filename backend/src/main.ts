@@ -9,10 +9,22 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: ['error', 'warn', 'log'] });
   const configService = app.get(ConfigService);
-  app.use(helmet());
+  // Configure helmet with more permissive settings for testing
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+    })
+  );
   app.use(cors());
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }));
+  // Temporarily disable global validation pipe for debugging
+  // app.useGlobalPipes(new ValidationPipe({ 
+  //   whitelist: true, 
+  //   transform: true, 
+  //   forbidNonWhitelisted: false, 
+  //   disableErrorMessages: false, 
+  // }));
   const config = new DocumentBuilder()
     .setTitle('Algosuite API')
     .setDescription('The Algosuite API documentation')

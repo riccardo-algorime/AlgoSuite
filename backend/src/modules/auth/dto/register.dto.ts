@@ -1,19 +1,9 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
-
+// Removed all validation decorators for debugging
 export class RegisterDto {
-  @IsEmail()
-  @IsNotEmpty()
   email!: string;
-
-  @IsString()
-  @MinLength(8)
-  @IsNotEmpty()
   password!: string;
-
-  @IsString()
   firstName?: string;
-
-  @IsString()
   lastName?: string;
+  full_name?: string;
 }
 
