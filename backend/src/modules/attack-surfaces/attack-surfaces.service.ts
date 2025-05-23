@@ -43,4 +43,11 @@ export class AttackSurfacesService {
   async remove(id: string): Promise<void> {
     await this.attackSurfacesRepository.delete(id);
   }
+
+  async findAllByProjectId(projectId: string): Promise<AttackSurface[]> {
+    return this.attackSurfacesRepository.find({
+      where: { project: { id: projectId } },
+      relations: ['project', 'assets']
+    });
+  }
 }

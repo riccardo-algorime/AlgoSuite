@@ -6,11 +6,13 @@ import { Project } from './entities/project.entity';
 import { ProjectsService } from './projects.service';
 import { ProjectsController } from './projects.controller';
 import { UsersModule } from '../users/users.module';
+import { AttackSurfacesModule } from '../attack-surfaces/attack-surfaces.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Project]),
     UsersModule,
+    AttackSurfacesModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
