@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Request } from 'express';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { AttackSurfacesService } from '../attack-surfaces/attack-surfaces.service';
 
 @ApiTags('projects')
 @ApiBearerAuth()
@@ -17,7 +18,8 @@ export class ProjectsController {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly attackSurfacesService: AttackSurfacesService
   ) {}
 
   @Get()
@@ -112,5 +114,21 @@ export class ProjectsController {
   async remove(@Param('id') id: string) {
     this.logger.log(`Removing project with ID: ${id}`);
     return this.projectsService.remove(id);
+  }
+
+  @Get(':projectId/attack-surfaces')
+  @ApiOperation({ summary: 'Get all attack surfaces for a project' })
+  @ApiResponse({ status: 200, description: 'Return all attack surfaces for the project' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  async findAttackSurfaces(@Param('projectId') projectId: string) {
+    this.logger.log(`Finding attack surfaces for project with ID: ${projectId}`);
+
+    // Verify that the project exists
+    const project = await this.projectsService.findOne(projectId);
+    if (!project) {
+      throw new HttpException('Project not found', HttpStatus.NOT_FOUND);
+    }
+
+    return this.attackSurfacesService.findAllByProjectId(projectId);
   }
 }
