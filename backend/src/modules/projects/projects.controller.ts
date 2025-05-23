@@ -1,6 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Req, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Req, Logger, HttpException, HttpStatus, ParseUUIDPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Project } from './entities/project.entity';
+import { AttackSurface } from '../attack-surfaces/entities/attack-surface.entity';
+import { CreateAttackSurfaceDto } from '../attack-surfaces/dto/create-attack-surface.dto';
 import { ProjectsService } from './projects.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Request } from 'express';
@@ -130,5 +132,54 @@ export class ProjectsController {
     }
 
     return this.attackSurfacesService.findAllByProjectId(projectId);
+  }
+
+  @Post(':projectId/attack-surfaces')
+  @ApiOperation({ summary: 'Create a new attack surface for a project' })
+  @ApiResponse({ status: 201, description: 'Attack surface created successfully', type: AttackSurface })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  async createAttackSurfaceForProject(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Body() createAttackSurfaceDto: CreateAttackSurfaceDto,
+    @Req() req: Request,
+  ): Promise<AttackSurface> {
+    try {
+      this.logger.log(`Creating attack surface for project with ID: ${projectId}`);
+      this.logger.log(`Attack surface data: ${JSON.stringify(createAttackSurfaceDto)}`);
+
+      // Extract token from authorization header
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) {
+        throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
+      }
+
+      try {
+        // Verify and decode the token
+        const payload = this.jwtService.verify(token);
+        const userId = payload.sub;
+
+        if (!userId) {
+          throw new HttpException('Invalid token payload', HttpStatus.UNAUTHORIZED);
+        }
+
+        // Create the attack surface using the service method
+        return this.attackSurfacesService.createForProject(projectId, createAttackSurfaceDto, userId);
+      } catch (error) {
+        this.logger.error(`Token verification failed: ${error.message}`);
+        throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+      }
+    } catch (error) {
+      this.logger.error(`Error creating attack surface: ${error.message}`);
+      throw new HttpException(
+        {
+          message: `Failed to create attack surface: ${error.message}`,
+          error: error.name || 'Error',
+          statusCode: error.status || HttpStatus.BAD_REQUEST
+        },
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
   }
 }
