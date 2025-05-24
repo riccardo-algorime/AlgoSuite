@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -26,11 +28,25 @@ export class UsersService {
   }
 
   async setRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
-    // Handle null case explicitly for TypeORM
-    if (refreshToken === null) {
-      await this.usersRepository.update(userId, { refreshToken: undefined });
-    } else {
-      await this.usersRepository.update(userId, { refreshToken });
+    this.logger.log(`Setting refresh token for user ${userId}`);
+    try {
+      const queryBuilder = this.usersRepository
+        .createQueryBuilder()
+        .update(User)
+        .where('id = :id', { id: userId });
+
+      // Handle null case explicitly
+      if (refreshToken === null) {
+        queryBuilder.set({ refreshToken: () => 'NULL' });
+      } else {
+        queryBuilder.set({ refreshToken: refreshToken });
+      }
+
+      await queryBuilder.execute();
+      this.logger.log(`Refresh token updated for user ${userId}`);
+    } catch (error) {
+      this.logger.error(`Error setting refresh token for user ${userId}: ${(error as Error).message}`);
+      throw error;
     }
   }
 
