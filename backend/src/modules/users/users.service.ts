@@ -30,12 +30,19 @@ export class UsersService {
   async setRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
     this.logger.log(`Setting refresh token for user ${userId}`);
     try {
-      await this.usersRepository
+      const queryBuilder = this.usersRepository
         .createQueryBuilder()
         .update(User)
-        .set({ refreshToken: refreshToken })
-        .where('id = :id', { id: userId })
-        .execute();
+        .where('id = :id', { id: userId });
+
+      // Handle null case explicitly
+      if (refreshToken === null) {
+        queryBuilder.set({ refreshToken: () => 'NULL' });
+      } else {
+        queryBuilder.set({ refreshToken: refreshToken });
+      }
+
+      await queryBuilder.execute();
       this.logger.log(`Refresh token updated for user ${userId}`);
     } catch (error) {
       this.logger.error(`Error setting refresh token for user ${userId}: ${(error as Error).message}`);
