@@ -3,9 +3,12 @@ import { Project } from '../../projects/entities/project.entity';
 import { Asset } from '../../assets/entities/asset.entity';
 
 export enum SurfaceType {
-  NETWORK = 'network',
   WEB = 'web',
+  API = 'api',
+  MOBILE = 'mobile',
+  NETWORK = 'network',
   CLOUD = 'cloud',
+  IOT = 'iot',
   OTHER = 'other',
 }
 

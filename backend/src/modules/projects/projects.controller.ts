@@ -1,6 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Req, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Req, Logger, HttpException, HttpStatus, ParseUUIDPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Project } from './entities/project.entity';
+import { AttackSurface } from '../attack-surfaces/entities/attack-surface.entity';
+import { CreateAttackSurfaceDto } from '../attack-surfaces/dto/create-attack-surface.dto';
 import { ProjectsService } from './projects.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Request } from 'express';
@@ -21,6 +23,35 @@ export class ProjectsController {
     private readonly jwtService: JwtService,
     private readonly attackSurfacesService: AttackSurfacesService
   ) {}
+
+  /**
+   * Extract and verify the user ID from the JWT token in the request
+   * @param req The Express request object containing the authorization header
+   * @returns The user ID extracted from the token
+   * @throws HttpException if token is missing, invalid, or doesn't contain a user ID
+   */
+  private extractUserIdFromToken(req: Request): string {
+    // Extract token from authorization header
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
+    }
+
+    try {
+      // Verify and decode the token
+      const payload = this.jwtService.verify(token);
+      const userId = payload.sub;
+
+      if (!userId) {
+        throw new HttpException('Invalid token payload', HttpStatus.UNAUTHORIZED);
+      }
+
+      return userId;
+    } catch (error) {
+      this.logger.error(`Token verification failed: ${error.message}`);
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+    }
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all projects' })
@@ -48,52 +79,34 @@ export class ProjectsController {
     try {
       this.logger.log('Creating new project');
       this.logger.log(`Project data: ${JSON.stringify(data)}`);
-      this.logger.log(`Request headers: ${JSON.stringify(req.headers)}`);
 
-      // Extract token from authorization header
-      const token = req.headers.authorization?.split(' ')[1];
-      if (!token) {
-        throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
+      // Extract user ID from token
+      const userId = this.extractUserIdFromToken(req);
+      this.logger.log(`Token verified for user: ${userId}`);
+
+      // Find the user
+      const user = await this.usersService.findById(userId);
+      if (!user) {
+        throw new HttpException('User not found in database', HttpStatus.BAD_REQUEST);
       }
 
-      try {
-        // Verify and decode the token
-        const payload = this.jwtService.verify(token);
-        this.logger.log(`Token payload: ${JSON.stringify(payload)}`);
+      // Associate the user with the project
+      const projectData = {
+        ...data,
+        owner: user
+      };
 
-        const userId = payload.sub;
-
-        if (!userId) {
-          throw new HttpException('Invalid token payload', HttpStatus.UNAUTHORIZED);
-        }
-
-        // Find the user
-        const user = await this.usersService.findById(userId);
-        if (!user) {
-          throw new HttpException('User not found in database', HttpStatus.BAD_REQUEST);
-        }
-
-        // Associate the user with the project
-        const projectData = {
-          ...data,
-          owner: user
-        };
-
-        this.logger.log(`Creating project for user: ${userId}`);
-        return this.projectsService.create(projectData);
-      } catch (error) {
-        this.logger.error(`Token verification failed: ${error.message}`);
-        throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
-      }
+      this.logger.log(`Creating project for user: ${userId}`);
+      return this.projectsService.create(projectData);
     } catch (error) {
       this.logger.error(`Error creating project: ${error.message}`);
       throw new HttpException(
         {
           message: `Failed to create project: ${error.message}`,
           error: error.name || 'Error',
-          statusCode: HttpStatus.BAD_REQUEST
+          statusCode: error.status || HttpStatus.BAD_REQUEST
         },
-        HttpStatus.BAD_REQUEST
+        error.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -130,5 +143,39 @@ export class ProjectsController {
     }
 
     return this.attackSurfacesService.findAllByProjectId(projectId);
+  }
+
+  @Post(':projectId/attack-surfaces')
+  @ApiOperation({ summary: 'Create a new attack surface for a project' })
+  @ApiResponse({ status: 201, description: 'Attack surface created successfully', type: AttackSurface })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  async createAttackSurfaceForProject(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Body() createAttackSurfaceDto: CreateAttackSurfaceDto,
+    @Req() req: Request,
+  ): Promise<AttackSurface> {
+    try {
+      this.logger.log(`Creating attack surface for project with ID: ${projectId}`);
+      this.logger.log(`Attack surface data: ${JSON.stringify(createAttackSurfaceDto)}`);
+
+      // Extract user ID from token
+      const userId = this.extractUserIdFromToken(req);
+      this.logger.log(`Token verified for user: ${userId}`);
+
+      // Create the attack surface using the service method
+      return this.attackSurfacesService.createForProject(projectId, createAttackSurfaceDto, userId);
+    } catch (error) {
+      this.logger.error(`Error creating attack surface: ${error.message}`);
+      throw new HttpException(
+        {
+          message: `Failed to create attack surface: ${error.message}`,
+          error: error.name || 'Error',
+          statusCode: error.status || HttpStatus.BAD_REQUEST
+        },
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
   }
 }

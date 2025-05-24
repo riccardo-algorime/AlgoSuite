@@ -16,32 +16,9 @@ import { useProject } from '../hooks/useProjects';
 import { useProjectAttackSurfaces } from '../hooks/useAttackSurfaces';
 import { AttackSurface, SurfaceType } from '../types';
 import { formatDate } from '../utils/formatters';
+import { getSurfaceTypeColorScheme, formatSurfaceType } from '../utils/surfaceHelpers';
 
-// Color scheme for different surface types
-const getSurfaceTypeColorScheme = (type: SurfaceType): string => {
-  switch (type) {
-    case SurfaceType.WEB:
-      return 'blue';
-    case SurfaceType.API:
-      return 'green';
-    case SurfaceType.MOBILE:
-      return 'purple';
-    case SurfaceType.NETWORK:
-      return 'orange';
-    case SurfaceType.CLOUD:
-      return 'cyan';
-    case SurfaceType.IOT:
-      return 'pink';
-    case SurfaceType.OTHER:
-    default:
-      return 'gray';
-  }
-};
 
-// Format surface type for display
-const formatSurfaceType = (type: SurfaceType): string => {
-  return type.charAt(0).toUpperCase() + type.slice(1);
-};
 
 export const ProjectPage = () => {
   // Get project ID from URL parameters
@@ -192,9 +169,10 @@ export const ProjectPage = () => {
                 </Table.Header>
                 <Table.Body>
                   {attackSurfaces.map((surface: AttackSurface) => {
-                    // Get color scheme and formatted type
-                    const colorScheme = getSurfaceTypeColorScheme(surface.surface_type);
-                    const formattedType = formatSurfaceType(surface.surface_type);
+                    // Get color scheme and formatted type - use both new and old property names for compatibility
+                    const surfaceType = surface.surfaceType || surface.surface_type;
+                    const colorScheme = getSurfaceTypeColorScheme(surfaceType);
+                    const formattedType = formatSurfaceType(surfaceType);
 
                     return (
                       <Table.Row key={surface.id}>
@@ -204,8 +182,8 @@ export const ProjectPage = () => {
                           </Badge>
                         </Table.Cell>
                         <Table.Cell>{surface.description || '-'}</Table.Cell>
-                        <Table.Cell>{formatDate(surface.created_at)}</Table.Cell>
-                        <Table.Cell>{formatDate(surface.updated_at)}</Table.Cell>
+                        <Table.Cell>{formatDate(surface.createdAt || surface.created_at)}</Table.Cell>
+                        <Table.Cell>{formatDate(surface.updatedAt || surface.updated_at)}</Table.Cell>
                         <Table.Cell textAlign="right">
                           <Button size="sm" variant="ghost" onClick={() => handleViewAttackSurface(surface)} mr={2}>
                             View
