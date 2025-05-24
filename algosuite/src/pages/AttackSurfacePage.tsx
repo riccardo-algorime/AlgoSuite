@@ -105,15 +105,18 @@ export const AttackSurfacePage = () => {
     );
   }
 
-  // Extract attack surface details
-  const { surface_type, description, created_at, updated_at, config, assets } = attackSurface;
+  // Extract attack surface details - use both new and old property names for compatibility
+  const surfaceType = attackSurface.surfaceType || attackSurface.surface_type;
+  const { description, config, assets } = attackSurface;
+  const createdAt = attackSurface.createdAt || attackSurface.created_at;
+  const updatedAt = attackSurface.updatedAt || attackSurface.updated_at;
 
   // Format data for display
-  const colorScheme = getSurfaceTypeColorScheme(surface_type);
-  const formattedType = formatSurfaceType(surface_type);
-  const formattedCreatedAt = formatDate(created_at);
-  const formattedUpdatedAt = formatDate(updated_at);
-  const surfaceIcon = getSurfaceTypeIcon(surface_type);
+  const colorScheme = getSurfaceTypeColorScheme(surfaceType);
+  const formattedType = formatSurfaceType(surfaceType);
+  const formattedCreatedAt = formatDate(createdAt);
+  const formattedUpdatedAt = formatDate(updatedAt);
+  const surfaceIcon = getSurfaceTypeIcon(surfaceType);
 
   return (
     <Container maxW="container.lg" py={8}>

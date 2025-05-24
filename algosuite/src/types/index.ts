@@ -86,10 +86,13 @@ export interface Project {
  */
 export interface AttackSurface {
   id: string;
-  project_id: string;
-  surface_type: SurfaceType;
+  project_id?: string; // Optional for backward compatibility
+  surfaceType: SurfaceType; // Match backend camelCase
+  surface_type?: SurfaceType; // Keep for backward compatibility
   description?: string;
   config?: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
+  created_at?: string; // Optional for backward compatibility
+  updated_at?: string; // Optional for backward compatibility
+  createdAt: string; // Match backend camelCase
+  updatedAt: string; // Match backend camelCase
 }

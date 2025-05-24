@@ -5,7 +5,10 @@ import { SurfaceType } from '../types/index';
  * @param type Surface type
  * @returns Chakra UI color scheme name
  */
-export function getSurfaceTypeColorScheme(type: SurfaceType): string {
+export function getSurfaceTypeColorScheme(type: SurfaceType | undefined | null): string {
+  if (!type) {
+    return 'gray';
+  }
   switch (type) {
     case SurfaceType.WEB:
       return 'blue';
@@ -30,7 +33,10 @@ export function getSurfaceTypeColorScheme(type: SurfaceType): string {
  * @param type Surface type
  * @returns Formatted surface type string
  */
-export function formatSurfaceType(type: SurfaceType): string {
+export function formatSurfaceType(type: SurfaceType | undefined | null): string {
+  if (!type) {
+    return 'Unknown';
+  }
   return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
@@ -39,7 +45,10 @@ export function formatSurfaceType(type: SurfaceType): string {
  * @param type Surface type
  * @returns Icon character
  */
-export function getSurfaceTypeIcon(type: SurfaceType): string {
+export function getSurfaceTypeIcon(type: SurfaceType | undefined | null): string {
+  if (!type) {
+    return '🔍';
+  }
   switch (type) {
     case SurfaceType.WEB:
       return '🌐';

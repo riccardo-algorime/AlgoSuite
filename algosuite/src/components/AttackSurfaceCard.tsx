@@ -3,38 +3,9 @@ import { Card } from './Card';
 import { AttackSurface, SurfaceType } from '../types';
 import { HStack } from './ui/stack';
 import { formatDate } from '../utils/formatters';
+import { getSurfaceTypeColorScheme, formatSurfaceType, getSurfaceTypeIcon } from '../utils/surfaceHelpers';
 
-// Icons for different surface types
-const getSurfaceTypeIcon = (_type: SurfaceType) => {
-  // This is a placeholder. In a real implementation, you would import and use actual icons
-  return '🔍';
-};
 
-// Color scheme for different surface types
-const getSurfaceTypeColorScheme = (type: SurfaceType): string => {
-  switch (type) {
-    case SurfaceType.WEB:
-      return 'blue';
-    case SurfaceType.API:
-      return 'green';
-    case SurfaceType.MOBILE:
-      return 'purple';
-    case SurfaceType.NETWORK:
-      return 'orange';
-    case SurfaceType.CLOUD:
-      return 'cyan';
-    case SurfaceType.IOT:
-      return 'pink';
-    case SurfaceType.OTHER:
-    default:
-      return 'gray';
-  }
-};
-
-// Format surface type for display
-const formatSurfaceType = (type: SurfaceType): string => {
-  return type.charAt(0).toUpperCase() + type.slice(1);
-};
 
 interface AttackSurfaceCardProps {
   attackSurface: AttackSurface;
@@ -51,15 +22,19 @@ export const AttackSurfaceCard = ({
   onDelete,
   isCompact = false,
 }: AttackSurfaceCardProps) => {
-  const { surface_type, description, created_at, updated_at } = attackSurface;
+  // Use both new and old property names for compatibility
+  const surfaceType = attackSurface.surfaceType || attackSurface.surface_type;
+  const { description } = attackSurface;
+  const createdAt = attackSurface.createdAt || attackSurface.created_at;
+  const updatedAt = attackSurface.updatedAt || attackSurface.updated_at;
 
   // Format dates for display
-  const formattedCreatedAt = formatDate(created_at);
-  const formattedUpdatedAt = formatDate(updated_at);
+  const formattedCreatedAt = formatDate(createdAt);
+  const formattedUpdatedAt = formatDate(updatedAt);
 
   // Get color scheme and formatted type
-  const colorScheme = getSurfaceTypeColorScheme(surface_type);
-  const formattedType = formatSurfaceType(surface_type);
+  const colorScheme = getSurfaceTypeColorScheme(surfaceType);
+  const formattedType = formatSurfaceType(surfaceType);
 
   return (
     <Card>
@@ -67,7 +42,7 @@ export const AttackSurfaceCard = ({
         <Flex justify="space-between" align="center" mb={2}>
           <Heading as="h3" size="md" color="text.primary">
             <Box as="span" mr={2}>
-              {getSurfaceTypeIcon(surface_type)}
+              {getSurfaceTypeIcon(surfaceType)}
             </Box>
             {formattedType} Surface
           </Heading>
