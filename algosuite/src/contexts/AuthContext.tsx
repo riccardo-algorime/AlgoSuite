@@ -1,6 +1,7 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { api } from '../api/apiClient';
 import { AuthContext } from './auth-context-type';
+import { getApiBaseUrl, getHostInfo } from '../utils/apiConfig';
 
 // User type
 interface User {
@@ -35,11 +36,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
     const user = localStorage.getItem(USER_KEY);
 
-    // Log token status for debugging
+    // Log token status and API configuration for debugging
+    const apiBaseUrl = getApiBaseUrl();
+    const hostInfo = getHostInfo();
     console.log('Auth initialization:', {
       hasToken: !!token,
       hasRefreshToken: !!refreshToken,
-      hasUser: !!user
+      hasUser: !!user,
+      apiBaseUrl,
+      hostInfo
     });
 
     // Ensure we have both tokens
@@ -123,7 +128,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       };
 
       // Call the backend API to authenticate
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/login`, {
+      const apiBaseUrl = getApiBaseUrl();
+      console.log('Login attempt to:', `${apiBaseUrl}/v1/auth/login`);
+      const response = await fetch(`${apiBaseUrl}/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +168,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // SECURITY NOTICE: In production, always validate tokens on the backend
       // The following approach prioritizes backend validation when available
       let userInfo;
-      
+
       try {
         // First try to get user info from API (secure approach)
         userInfo = await fetchUserInfo(data.access_token);
@@ -169,11 +176,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } catch (userInfoError) {
         console.warn('Backend /me endpoint failed, using token decoding as TEMPORARY fallback', userInfoError);
         console.warn('SECURITY WARNING: Token decoding on frontend should only be used during development');
-        
+
         // DEVELOPMENT FALLBACK ONLY: Extract user info from token
         // This approach bypasses proper backend validation and should NOT be used in production
         userInfo = extractUserFromToken(data.access_token);
-        
+
         if (!userInfo) {
           console.error('Both backend validation and token decoding failed');
           throw new Error('Failed to get user information');
@@ -216,37 +223,37 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   /**
    * SECURITY WARNING: This function is for DEVELOPMENT USE ONLY.
-   * 
+   *
    * Extracting and trusting user information from JWT tokens on the frontend
    * is NOT secure for production environments because:
-   * 
+   *
    * 1. It bypasses proper signature verification
    * 2. It doesn't validate if the user still exists in the database
    * 3. It doesn't check if the user account is still active/not banned
    * 4. It could be manipulated by sophisticated attackers
-   * 
+   *
    * In production, ALWAYS validate tokens on the backend through a proper /me endpoint.
    * This function should only be used as a fallback during development or when
    * backend services are temporarily unavailable.
    */
   const extractUserFromToken = (token: string): User | null => {
     if (!token) return null;
-    
+
     try {
       // JWT tokens are in the format: header.payload.signature
       const tokenParts = token.split('.');
       if (tokenParts.length !== 3) return null;
-      
+
       // The payload is the second part (index 1) and is base64 encoded
       // Need to handle base64url format by replacing characters and adding padding
       const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
       const padding = '='.repeat((4 - base64.length % 4) % 4);
       const jsonPayload = atob(base64 + padding);
-      
+
       const payload = JSON.parse(jsonPayload);
       console.log('Extracted user info from token:', payload);
       console.warn('DEVELOPMENT MODE: Using unverified token data - NOT FOR PRODUCTION');
-      
+
       // Create a user object from the payload
       return {
         id: payload.sub,
@@ -271,7 +278,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     let lastError;
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/me`, {
+        const apiBaseUrl = getApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/v1/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -282,7 +290,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           if (response.status === 401 || response.status === 403) {
             throw new Error(`Authentication error: ${response.status}`);
           }
-          
+
           // For other errors, we'll retry
           throw new Error(`Failed to fetch user info: ${response.status}`);
         }
@@ -291,7 +299,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } catch (error) {
         console.warn(`Attempt ${attempt + 1} failed:`, error);
         lastError = error;
-        
+
         // Don't wait on the last attempt
         if (attempt < 2) {
           // Exponential backoff: 500ms, 1000ms
@@ -307,7 +315,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Function to refresh the access token using a refresh token
   const refreshAccessToken = async (refreshToken: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`, {
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/v1/auth/refresh?refresh_token=${encodeURIComponent(refreshToken)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -349,7 +358,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       // With JWT-based auth, we just need to call the logout endpoint
       // No need to send the refresh token as we're not invalidating it server-side
-      await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/logout`, {
+      const apiBaseUrl = getApiBaseUrl();
+      await fetch(`${apiBaseUrl}/v1/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -426,8 +436,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Call the backend API to refresh the token
       // Send refresh_token in the request body for better security
+      const apiBaseUrl = getApiBaseUrl();
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/v1/auth/refresh`,
+        `${apiBaseUrl}/v1/auth/refresh`,
         {
           method: 'POST',
           headers: {

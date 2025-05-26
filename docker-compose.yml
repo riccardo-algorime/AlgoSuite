@@ -11,7 +11,10 @@ services:
       - ./algosuite:/app
       - /app/node_modules
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000/api
+      # API URL will be dynamically determined by the frontend
+      # Set this only if you want to override the automatic detection
+      # - VITE_API_BASE_URL=http://your-server-ip:8000/api
+      - NODE_ENV=${NODE_ENV:-development}
     depends_on:
       backend:
         condition: service_started
@@ -45,6 +48,7 @@ services:
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - ALGORITHM=HS256
       - OPENAI_API_KEY=${OPENAI_API_KEY:-sk-dummy-key-for-development-only}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173}
     depends_on:
       db:
         condition: service_healthy

@@ -16,14 +16,36 @@ async function bootstrap() {
       crossOriginEmbedderPolicy: false,
     })
   );
-  app.use(cors());
+  // Configure CORS for external access
+  app.use(cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      // Allow all origins in development
+      if (configService.get('ENVIRONMENT') === 'development') {
+        return callback(null, true);
+      }
+
+      // In production, you should specify allowed origins
+      const allowedOrigins = configService.get('CORS_ORIGINS')?.split(',') || ['http://localhost:5173'];
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  }));
   app.setGlobalPrefix('api');
   // Temporarily disable global validation pipe for debugging
-  // app.useGlobalPipes(new ValidationPipe({ 
-  //   whitelist: true, 
-  //   transform: true, 
-  //   forbidNonWhitelisted: false, 
-  //   disableErrorMessages: false, 
+  // app.useGlobalPipes(new ValidationPipe({
+  //   whitelist: true,
+  //   transform: true,
+  //   forbidNonWhitelisted: false,
+  //   disableErrorMessages: false,
   // }));
   const config = new DocumentBuilder()
     .setTitle('Algosuite API')

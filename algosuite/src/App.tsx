@@ -18,6 +18,7 @@ import { EditAttackSurfacePage } from './pages/EditAttackSurfacePage'
 import { StudioPage } from './pages/StudioPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AuthProvider } from './contexts/AuthContext'
+import { ApiDebugInfo } from './components/ApiDebugInfo'
 import { ChakraProvider } from '@chakra-ui/react'
 import { ColorModeProvider } from './components/ui/color-mode'
 import { Toaster } from './components/ui/toaster'
@@ -138,6 +139,7 @@ function App() {
               </Routes>
             </Layout>
             <Toaster />
+            <ApiDebugInfo />
           </AuthProvider>
         </ColorModeProvider>
       </ChakraProvider>

@@ -69,14 +69,45 @@ ENV/
 celerybeat-schedule
 celerybeat.pid
 
-# DO NOT ignore .env files (private repo)
-# .env
-
-# Added by Claude Task Master
-# Environment variables
+# Environment variables and sensitive configuration
 .env
-.idea
-.vscode
-# Task files
+.env.*
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+
+# API Keys and secrets
+**/secrets/
+**/config/secrets.*
+**/*secret*
+**/*credential*
+**/*key*.pem
+**/*key*.key
+**/*.p12
+**/*.pfx
+
+# Database and service credentials
+**/database.config.local.*
+**/redis.config.local.*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Task and project management files
 tasks.json
-tasks/ 
+tasks/
+.taskmasterconfig
+
+# AlgoSuite specific sensitive files
+**/pentest-results/
+**/scan-outputs/
+**/vulnerability-reports/
+**/assessment-data/
