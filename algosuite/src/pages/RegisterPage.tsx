@@ -17,7 +17,8 @@ import { NavLink as Link } from '../components/ui/link';
 
 export const RegisterPage = () => {
   const [email, setEmail] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,7 @@ export const RegisterPage = () => {
     setError(null);
 
     // Check if all fields are filled
-    if (!email || !fullName || !password || !confirmPassword) {
+    if (!email || !firstName || !lastName || !password || !confirmPassword) {
       setError('All fields are required');
       return false;
     }
@@ -70,6 +71,8 @@ export const RegisterPage = () => {
     setIsLoading(true);
 
     try {
+      // Combine firstName and lastName for the register function
+      const fullName = `${firstName} ${lastName}`.trim();
       await register(email, fullName, password);
       // Redirect to login page after successful registration
       navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
@@ -111,14 +114,26 @@ export const RegisterPage = () => {
                 </FormControl>
 
                 <FormControl isRequired>
-                  <FormLabel htmlFor="fullName">Full Name</FormLabel>
+                  <FormLabel htmlFor="firstName">First Name</FormLabel>
                   <Input
-                    id="fullName"
+                    id="firstName"
                     type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     disabled={isLoading}
-                    placeholder="John Doe"
+                    placeholder="John"
+                  />
+                </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel htmlFor="lastName">Last Name</FormLabel>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    disabled={isLoading}
+                    placeholder="Doe"
                   />
                 </FormControl>
 

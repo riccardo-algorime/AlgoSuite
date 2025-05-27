@@ -105,7 +105,7 @@ async function refreshAuthToken(): Promise<void> {
   }
 
   isRefreshing = true;
-  refreshPromise = new Promise<void>(async (resolve, reject) => {
+  refreshPromise = (async () => {
     try {
       const refreshToken = localStorage.getItem('algosuite_refresh_token');
 
@@ -149,8 +149,6 @@ async function refreshAuthToken(): Promise<void> {
       // Update auth header
       defaultHeaders.set('Authorization', `Bearer ${data.access_token}`);
       console.log('Token refreshed successfully and stored in localStorage');
-
-      resolve();
     } catch (error) {
       console.error('Error refreshing token:', error);
 
@@ -168,11 +166,11 @@ async function refreshAuthToken(): Promise<void> {
         }));
       }
 
-      reject(error);
+      throw error;
     } finally {
       isRefreshing = false;
     }
-  });
+  })();
 
   return refreshPromise;
 }

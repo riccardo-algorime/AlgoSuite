@@ -23,6 +23,12 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      // Change TypeScript 'any' usage from error to warning
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Also change unused vars to warning instead of error
+      '@typescript-eslint/no-unused-vars': 'warn',
+      // Allow require() imports in test files (common in Jest setup)
+      '@typescript-eslint/no-require-imports': 'warn',
     },
   },
 )

@@ -64,7 +64,7 @@ export const CreateAttackSurfacePage = () => {
 
   // Validate a specific field
   const validateField = (field: string, value: any) => {
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
 
     switch (field) {
       case "surfaceType":
@@ -208,7 +208,7 @@ export const CreateAttackSurfacePage = () => {
                   padding: '0.5rem',
                   borderRadius: '0.375rem',
                   border: '1px solid',
-                  borderColor: !!errors.surfaceType ? 'red' : inputBorderColor,
+                  borderColor: errors.surfaceType ? 'red' : inputBorderColor,
                   backgroundColor: inputBgColor,
                   color: inputTextColor
                 }}
@@ -239,7 +239,7 @@ export const CreateAttackSurfacePage = () => {
                   padding: '0.5rem',
                   borderRadius: '0.375rem',
                   border: '1px solid',
-                  borderColor: !!errors.description ? 'red' : inputBorderColor,
+                  borderColor: errors.description ? 'red' : inputBorderColor,
                   backgroundColor: inputBgColor,
                   color: inputTextColor,
                   resize: 'vertical'
