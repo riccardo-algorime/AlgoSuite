@@ -73,7 +73,11 @@ export const Layout = ({ children }: LayoutProps) => {
               <HStack spacing={2}>
                 <NavLink to="/" _hover={{ textDecoration: 'none' }}>
                   <Heading as="h1" size="md" color="white" m={0}>
-                    ricardobevoni
+                    {authState.isAuthenticated && authState.user
+                      ? (authState.user.firstName && authState.user.lastName
+                        ? `${authState.user.firstName} ${authState.user.lastName}`
+                        : authState.user.name || authState.user.email)
+                      : 'ricardobevoni'} 
                   </Heading>
                 </NavLink>
                 <Button
@@ -112,19 +116,25 @@ export const Layout = ({ children }: LayoutProps) => {
             {/* Right Side Controls */}
             <HStack spacing={4} align="center">
               <Button
+                as={NavLink}
+                to="/feedback"
                 variant="outline"
                 size="sm"
                 color="white"
                 borderColor="gray.600"
-                _hover={{ bg: 'gray.800' }}
+                opacity={isActive('/feedback') ? 1 : 0.9}
+                _hover={{ bg: 'gray.800', textDecoration: 'none', opacity: 1 }}
               >
                 Feedback
               </Button>
               <Button
+                as={NavLink}
+                to="/changelog"
                 variant="ghost"
                 size="sm"
                 color="white"
-                _hover={{ bg: 'gray.800' }}
+                opacity={isActive('/changelog') ? 1 : 0.9}
+                _hover={{ bg: 'gray.800', textDecoration: 'none', opacity: 1 }}
               >
                 Changelog
               </Button>
@@ -136,15 +146,15 @@ export const Layout = ({ children }: LayoutProps) => {
               >
                 <DocsIcon boxSize={5} />
               </NavLink>
-              <Button
-                variant="ghost"
-                size="sm"
+              <NavLink
+                to="/settings"
                 color="white"
-                _hover={{ bg: 'gray.800' }}
-                p={1}
+                opacity={isActive('/settings') ? 1 : 0.7}
+                _hover={{ opacity: 1 }}
+                p={1} // Keep padding for click area
               >
                 <SettingsIcon boxSize={5} />
-              </Button>
+              </NavLink>
 
               {/* Logout Button */}
               {authState.isAuthenticated && (
